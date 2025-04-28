@@ -5,18 +5,30 @@ const users = (users) => {
   this.user_id = users.user_id;
   this.full_name = users.full_name;
   this.email = users.email;
-  this.password = users.password;
+  this.password_hash = users.password_hash;
   this.avatar_url = users.avatar_url;
   this.phone = users.phone;
   this.gender = users.gender;
   this.dob = users.dob;
   this.role = users.role;
   this.created_at = users.created_at;
+  this.updated_at = users.updated_at;
+  this.is_active = users.is_active;
+  this.last_login = users.last_login;
 };
 
 users.getById = (id, callback) => {
   const sqlString = "SELECT * FROM users WHERE id = ? ";
   db.query(sqlString, id, (err, result) => {
+    if (err) {
+      return callback(err);
+    }
+    callback(result);
+  });
+};
+users.GetbyEmail = (email,password, callback) => {
+  const sqlString = "SELECT * FROM users WHERE Email = ? and Password = ? ";
+  db.query(sqlString, email, password, (err, result) => {
     if (err) {
       return callback(err);
     }

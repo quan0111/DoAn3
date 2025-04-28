@@ -14,7 +14,13 @@ const jobs = (jobs) => {
   this.job_level = jobs.job_level;
   this.job_type = jobs.job_type;
   this.deadline = jobs.deadline;
+  this.status = jobs.status;
+  this.priority_score = jobs.priority_score;
+  this.auto_expire = jobs.auto_expire;
+  this.view_count = jobs.view_count;
+  this.application_count = jobs.application_count;
   this.created_at = jobs.created_at;
+  this.updated_at = jobs.updated_at;
 };
 
 jobs.getById = (id, callback) => {

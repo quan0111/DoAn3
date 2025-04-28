@@ -11,6 +11,9 @@ const companies = (companies) => {
   this.location = companies.location;
   this.company_size = companies.company_size;
   this.industry = companies.industry;
+  this.verified = companies.verified;
+  this.created_at = companies.created_at;
+  this.updated_at = companies.updated_at;
 };
 
 companies.getById = (id, callback) => {

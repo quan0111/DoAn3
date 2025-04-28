@@ -11,7 +11,11 @@ const resumes = (resumes) => {
   this.skills = resumes.skills;
   this.certificates = resumes.certificates;
   this.file_url = resumes.file_url;
+  this.is_public = resumes.is_public;
+  this.verified_status = resumes.verified_status;
+  this.view_count = resumes.view_count;
   this.created_at = resumes.created_at;
+  this.updated_at = resumes.updated_at;
 };
 
 resumes.getById = (id, callback) => {

@@ -4,6 +4,7 @@ const db = require("../common/db");
 const notifications = (notifications) => {
   this.notification_id = notifications.notification_id;
   this.user_id = notifications.user_id;
+  this.type = notifications.type;
   this.message = notifications.message;
   this.is_read = notifications.is_read;
   this.created_at = notifications.created_at;

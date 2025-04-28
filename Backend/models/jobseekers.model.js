@@ -7,6 +7,11 @@ const jobseekers = (jobseekers) => {
   this.experience_years = jobseekers.experience_years;
   this.desired_salary_min = jobseekers.desired_salary_min;
   this.desired_salary_max = jobseekers.desired_salary_max;
+  this.job_preferences = jobseekers.job_preferences;
+  this.linkedin_url = jobseekers.linkedin_url;
+  this.portfolio_url = jobseekers.portfolio_url;
+  this.created_at = jobseekers.created_at;
+  this.updated_at = jobseekers.updated_at;
 };
 
 jobseekers.getById = (id, callback) => {

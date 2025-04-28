@@ -8,7 +8,12 @@ const articles = (articles) => {
   this.content = articles.content;
   this.thumbnail_url = articles.thumbnail_url;
   this.author_id = articles.author_id;
+  this.category = articles.category;
+  this.tags = articles.tags;
+  this.like_count = articles.like_count;
   this.published_at = articles.published_at;
+  this.updated_at = articles.updated_at;
+  this.view_count = articles.view_count;
 };
 
 articles.getById = (id, callback) => {

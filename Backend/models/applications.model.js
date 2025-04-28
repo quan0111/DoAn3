@@ -9,6 +9,7 @@ const applications = (applications) => {
   this.cover_letter = applications.cover_letter;
   this.status = applications.status;
   this.applied_at = applications.applied_at;
+  this.updated_at = applications.updated_at;
 };
 
 applications.getById = (id, callback) => {
