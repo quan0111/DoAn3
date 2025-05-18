@@ -47,7 +47,6 @@ function App() {
         <Route path="/Phan-tich-nghe-nghiep" element={<CareerInsightsPage />} />
         <Route path="/Premium" element={<PremiumServicesPage />} />
         <Route path="/About" element={<AboutContactPage />} />
-
         <Route path="/tao-cv" element={<CreateCVPage />} />
         <Route path="/nha-tuyen-dung" element={<EmployerHomePage />} />
         <Route path="/quan-ly-cv" element={<CVManagementPage />} />

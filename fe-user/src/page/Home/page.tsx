@@ -6,6 +6,7 @@ import { Templates } from "@/components/Cv-templates"
 import { Testimonials } from "@/components/Testimonial"
 import { CTA } from "@/components/cta"
 import { Pricing } from "@/components/pricing"
+import JobListings from "@/components/Job-list"
 
 export default function Home() {
   return (
@@ -15,6 +16,7 @@ export default function Home() {
         <Hero />
         <Features />
         <Templates />
+        <JobListings></JobListings>
         <Testimonials />
         <CTA />
         <Pricing />
