@@ -4,6 +4,7 @@ const db = require("../common/db");
 const jobseekers = (jobseekers) => {
   this.user_id = jobseekers.user_id;
   this.career_goals = jobseekers.career_goals;
+  this.Desired_position= jobseekers.Desired_position
   this.experience_years = jobseekers.experience_years;
   this.desired_salary_min = jobseekers.desired_salary_min;
   this.desired_salary_max = jobseekers.desired_salary_max;

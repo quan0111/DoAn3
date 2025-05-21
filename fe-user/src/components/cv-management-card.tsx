@@ -71,7 +71,7 @@ export function CVManagementCard({
       <CardContent className="p-4 pt-2">
         <p className="text-sm text-muted-foreground">Mẫu: {templateName}</p>
       </CardContent>
-      <CardFooter className="p-4 pt-0 flex flex-wrap gap-2">
+      <CardFooter className="p-2 pt-0 flex flex-wrap gap-2">
         <Button variant="outline" size="sm" asChild>
           <Link to={`/tao-cv?id=${id}`}>
             <Edit className="h-4 w-4 mr-1" />

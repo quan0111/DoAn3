@@ -4,16 +4,13 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-const cors = require('cors');
-var app = express();
-app.use(cors());
+var cors = require('cors');
+const port = 3000; // Đây là cổng bạn cần biết
+
 
 // Require các router
 var indexRouter = require('./routes/index');
 var advertisementsRouter = require('./routes/advertisements.route');
-var ai_contextsRouter = require('./routes/ai_contexts.route');
-var ai_intentsRouter = require('./routes/ai_intents.route');
-var ai_queriesRouter = require('./routes/ai_queries.route');
 var analyticsRouter = require('./routes/analytics.route');
 var applicationsRouter = require('./routes/applications.route');
 var article_categoriesRouter = require('./routes/article_categories.route');
@@ -21,6 +18,12 @@ var article_category_mappingRouter = require('./routes/article_category_mapping.
 var articlesRouter = require('./routes/articles.route');
 var companiesRouter = require('./routes/companies.route');
 var company_followersRouter = require('./routes/company_followers.route');
+var cv_template_categoriesRouter = require('./routes/cv_template_categories.route');
+var cv_template_componentsRouter = require('./routes/cv_template_components.route');
+var cv_template_industriesRouter = require('./routes/cv_template_industries.route');
+var cv_template_ratingsRouter = require('./routes/cv_template_ratings.route');
+var cv_template_usage_statsRouter = require('./routes/cv_template_usage_stats.route');
+var cv_templatesRouter = require('./routes/cv_templates.route');
 var eventsRouter = require('./routes/events.route');
 var feedbacksRouter = require('./routes/feedbacks.route');
 var interviewsRouter = require('./routes/interviews.route');
@@ -33,12 +36,12 @@ var notificationsRouter = require('./routes/notifications.route');
 var paymentsRouter = require('./routes/payments.route');
 var resumesRouter = require('./routes/resumes.route');
 var saved_jobsRouter = require('./routes/saved_jobs.route');
-var translationsRouter = require('./routes/translations.route');
 var user_activitiesRouter = require('./routes/user_activities.route');
+var user_cv_templatesRouter = require('./routes/user_cv_templates.route');
 var usersRouter = require('./routes/users.route');
 
-
-
+var app = express();
+app.use(cors());
 // View engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -52,9 +55,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Đăng ký các router
 app.use('/', indexRouter);
 app.use('/advertisementss', advertisementsRouter);
-app.use('/ai_contextss', ai_contextsRouter);
-app.use('/ai_intentss', ai_intentsRouter);
-app.use('/ai_queriess', ai_queriesRouter);
 app.use('/analyticss', analyticsRouter);
 app.use('/applicationss', applicationsRouter);
 app.use('/article_categoriess', article_categoriesRouter);
@@ -62,6 +62,12 @@ app.use('/article_category_mappings', article_category_mappingRouter);
 app.use('/articless', articlesRouter);
 app.use('/companiess', companiesRouter);
 app.use('/company_followerss', company_followersRouter);
+app.use('/cv_template_categoriess', cv_template_categoriesRouter);
+app.use('/cv_template_componentss', cv_template_componentsRouter);
+app.use('/cv_template_industriess', cv_template_industriesRouter);
+app.use('/cv_template_ratingss', cv_template_ratingsRouter);
+app.use('/cv_template_usage_statss', cv_template_usage_statsRouter);
+app.use('/cv_templatess', cv_templatesRouter);
 app.use('/eventss', eventsRouter);
 app.use('/feedbackss', feedbacksRouter);
 app.use('/interviewss', interviewsRouter);
@@ -74,8 +80,8 @@ app.use('/notificationss', notificationsRouter);
 app.use('/paymentss', paymentsRouter);
 app.use('/resumess', resumesRouter);
 app.use('/saved_jobss', saved_jobsRouter);
-app.use('/translationss', translationsRouter);
 app.use('/user_activitiess', user_activitiesRouter);
+app.use('/user_cv_templatess', user_cv_templatesRouter);
 app.use('/userss', usersRouter);
 
 // Catch 404 and forward to error handler
@@ -93,9 +99,9 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
-const port = 3000;
 app.listen(port, () => {
-  console.log(`Server đang chạy tại http://localhost:${port}`);
+  console.log(`Back-end đang chạy trên cổng: ${port}`);
 });
+
 
 module.exports = app;

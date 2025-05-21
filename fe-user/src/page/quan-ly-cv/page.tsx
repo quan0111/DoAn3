@@ -3,6 +3,8 @@ import { CVManagementCard } from "@/components/cv-management-card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { PlusCircle, Search } from "lucide-react"
 import { Link } from "react-router-dom"
+import { Header } from "@/components/Header"
+import { Footer } from "@/components/footer"
 // Mock data for CV list
 const mockCVs = [
   {
@@ -148,6 +150,7 @@ export default function CVManagementPage() {
           </Button>
         </div>
       )}
+      <Footer></Footer>
     </div>
   )
 }

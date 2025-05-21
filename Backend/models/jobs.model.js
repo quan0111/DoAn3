@@ -4,6 +4,8 @@ const db = require("../common/db");
 const jobs = (jobs) => {
   this.job_id = jobs.job_id;
   this.company_id = jobs.company_id;
+  this.company_name = jobs.company_name;
+  this.logo_url = jobs.logo_url;
   this.title = jobs.title;
   this.description = jobs.description;
   this.requirements = jobs.requirements;
@@ -24,7 +26,7 @@ const jobs = (jobs) => {
 };
 
 jobs.getById = (id, callback) => {
-  const sqlString = "SELECT * FROM jobs WHERE id = ? ";
+  const sqlString = "SELECT job_id,jobs.company_id,company_name,logo_url,title,jobs.description,requirements,benefits,salary_min,salary_max,jobs.location,job_level,job_type,status,priority_score,auto_expire,view_count,application_count,jobs.created_at,jobs.updated_at FROM jobs inner join companies on jobs.company_id = companies.company_id WHERE job_id = ?";
   db.query(sqlString, id, (err, result) => {
     if (err) {
       return callback(err);
@@ -34,7 +36,7 @@ jobs.getById = (id, callback) => {
 };
 
 jobs.getAll = (callback) => {
-  const sqlString = "SELECT * FROM jobs ";
+  const sqlString = "SELECT job_id,jobs.company_id,company_name,logo_url,title,jobs.description,requirements,benefits,salary_min,salary_max,jobs.location,job_level,job_type,status,priority_score,auto_expire,view_count,application_count,jobs.created_at,jobs.updated_at FROM jobs inner join companies on jobs.company_id = companies.company_id";
   db.query(sqlString, (err, result) => {
     if (err) {
       return callback(err);

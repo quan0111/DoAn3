@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
+import axios from "axios" // ✅ Đúng cách
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -7,82 +8,29 @@ import { Search, MapPin, Heart } from "lucide-react"
 
 // Type definitions
 interface Job {
-  job_id: number
-  title: string
-  company_name: string
-  logo_url?: string
-  location: string
-  salary_range: string
-  created_at: string
+ job_id: string;
+  company_id: string;
+  company_name: string;
+  logo_url: string;
+  title: string;
+  description: string;
+  requirements: string[]; // nên khai báo rõ kiểu phần tử
+  benefits: string;
+  salary_min: number;
+  salary_max: number;
+  location: string;
+  job_level: string;
+  job_type: string;
+  deadline: Date;
+  status: string;
+  priority_score: number;
+  auto_expire: number;
+  view_count: number;
+  application_count: number;
+  created_at: Date;
+  updated_at: Date;
 }
 
-// Static mock data
-const mockJobs: Job[] = [
-  {
-    job_id: 1,
-    title: "Chuyên Viên Kiến Soát Nội Bộ",
-    company_name: "Công ty TNHH Blue Elation",
-    logo_url: "https://example.com/logo1.png",
-    location: "Hà Nội",
-    salary_range: "18 - 20 triệu",
-    created_at: "2023-05-10",
-  },
-  {
-    job_id: 2,
-    title: "Trưởng Phòng Marketing - Lương Up to",
-    company_name: "Công ty Cổ phần Comacpro",
-    logo_url: "https://example.com/logo2.png",
-    location: "Hà Nội",
-    salary_range: "20 - 25 triệu + Thưởng KPI",
-    created_at: "2023-05-09",
-  },
-  {
-    job_id: 3,
-    title: "Nhân Viên Kinh Doanh/Kỹ Sư Bán",
-    company_name: "Công ty TNHH Hitachi Việt Nam",
-    logo_url: "https://example.com/logo3.png",
-    location: "Hà Nội",
-    salary_range: "11 - 14 triệu",
-    created_at: "2023-05-08",
-  },
-  {
-    job_id: 4,
-    title: "Chuyên Viên Tư Vấn Tài Chính Cao Cấp",
-    company_name: "Công ty TNHH Bảo Hiểm Nhân Thọ Generali",
-    logo_url: "https://example.com/logo4.png",
-    location: "Hồ Chí Minh, Đà Nẵng",
-    salary_range: "30 - 50 triệu",
-    created_at: "2023-05-07",
-  },
-  {
-    job_id: 5,
-    title: "Nhân Viên Kinh Doanh/Tư Vấn Resale",
-    company_name: "Công ty TNHH Halovn - Chi nhánh Hà Nội",
-    logo_url: "https://example.com/logo5.png",
-    location: "Hà Nội",
-    salary_range: "8 - 15 triệu",
-    created_at: "2023-05-06",
-  },
-  {
-    job_id: 6,
-    title: "Nhân Viên SEO - C6 1 Năm Kinh Nghiệm",
-    company_name: "Công ty Cổ phần Truyền Thông và Quảng cáo MLC Creative",
-    logo_url: "https://example.com/logo6.png",
-    location: "Hà Nội",
-    salary_range: "8 - 12 triệu",
-    created_at: "2023-05-05",
-  },
-  // Thêm dữ liệu để mô phỏng nhiều trang
-  {
-    job_id: 7,
-    title: "Nhân Viên IT Hỗ Trợ",
-    company_name: "Công ty TNHH Tech Solutions",
-    logo_url: "https://example.com/logo7.png",
-    location: "Thành phố Hồ Chí Minh",
-    salary_range: "15 - 20 triệu",
-    created_at: "2023-05-04",
-  },
-]
 
 // Static filter options
 const locations = ["Ngẫu nhiên", "Hà Nội", "Thành phố Hồ Chí Minh", "Miền Bắc", "Miền Nam"]
@@ -95,9 +43,17 @@ export default function JobListings() {
   const jobsPerPage = 6
 
   useEffect(() => {
-    // Giả lập fetch dữ liệu từ API
-    setJobs(mockJobs)
-  }, [])
+    const fetchJobs = async  () =>{
+        try{
+          const respone = await axios.get("http://localhost:3000/jobss")
+          setJobs(respone.data)
+        }
+         catch (error) {
+      console.error("Lỗi khi fetch jobs:", error)
+    }
+    }
+    fetchJobs()
+  },[]) 
 
   const filteredJobs = jobs
     .filter((job) => {
@@ -151,12 +107,12 @@ export default function JobListings() {
                     <img src={job.logo_url} alt={job.company_name} className="h-10 w-10 rounded-full object-contain" />
                   )}
                   <div className="flex-1">
-                    <CardTitle className="text-base font-semibold text-gray-900 line-clamp-2">{job.title}</CardTitle>
-                    <p className="text-xs text-gray-600">{job.company_name}</p>
-                    <p className="text-xs text-gray-500 flex items-center gap-1">
+                    <CardTitle className="text-base font-semibold text-gray-900 line-clamp-2 text-left">{job.title}</CardTitle>
+                    <p className="text-xs text-gray-600 text-left ">{job.company_name}</p>
+                    <p className="text-xs text-gray-500 flex items-center gap-1 ">
                       <MapPin className="h-3 w-3" /> {job.location}
                     </p>
-                    <p className="text-sm font-medium text-gray-800">{job.salary_range}</p>
+                    <p className="text-sm font-medium text-gray-800 text-left">{job.salary_min}0.000đ - {job.salary_max}0.000đ</p>
                   </div>
                   <div className="flex flex-col items-end gap-1">
                     <Button
@@ -164,8 +120,8 @@ export default function JobListings() {
                     >
                       Thảo luận
                     </Button>
-                    <button className="text-[#00C853] hover:text-[#00A64B] transition-colors">
-                      <Heart className="h-4 w-4" />
+                    <button className="text-[#00C853] hover:text-[#00A64B] transition-colors ">
+                      <Heart className="h-4 w-4 " />
                     </button>
                   </div>
                 </CardContent>

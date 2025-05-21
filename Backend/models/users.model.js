@@ -26,15 +26,6 @@ users.getById = (id, callback) => {
     callback(result);
   });
 };
-users.GetbyEmail = (email,password, callback) => {
-  const sqlString = "SELECT * FROM users WHERE Email = ? and Password = ? ";
-  db.query(sqlString, email, password, (err, result) => {
-    if (err) {
-      return callback(err);
-    }
-    callback(result);
-  });
-};
 
 users.getAll = (callback) => {
   const sqlString = "SELECT * FROM users ";

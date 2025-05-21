@@ -1,38 +1,38 @@
 
-const ai_intents = require("../models/ai_intents.model");
+const cv_templates = require("../models/cv_templates.model");
 
 module.exports = {
   getAll: (req, res) => {
-    ai_intents.getAll((result) => {
+    cv_templates.getAll((result) => {
       res.send(result);
     });
   },
 
   getById: (req, res) => {
     const id = req.params.id;
-    ai_intents.getById(id, (result) => {
+    cv_templates.getById(id, (result) => {
       res.send(result);
     });
   },
 
   insert: (req, res) => {
-    const ai_intents = req.body;
-    ai_intents.insert(ai_intents, (result) => {
+    const cv_templates = req.body;
+    cv_templates.insert(cv_templates, (result) => {
       res.send(result);
     });
   },
 
   update: (req, res) => {
-    const ai_intents = req.body;
+    const cv_templates = req.body;
     const id = req.params.id;
-    ai_intents.update(ai_intents, id, (result) => {
+    cv_templates.update(cv_templates, id, (result) => {
       res.send(result);
     });
   },
 
   delete: (req, res) => {
     const id = req.params.id;
-    ai_intents.delete(id, (result) => {
+    cv_templates.delete(id, (result) => {
       res.send(result);
     });
   },

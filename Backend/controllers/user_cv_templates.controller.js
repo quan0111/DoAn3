@@ -1,38 +1,38 @@
 
-const ai_queries = require("../models/ai_queries.model");
+const user_cv_templates = require("../models/user_cv_templates.model");
 
 module.exports = {
   getAll: (req, res) => {
-    ai_queries.getAll((result) => {
+    user_cv_templates.getAll((result) => {
       res.send(result);
     });
   },
 
   getById: (req, res) => {
     const id = req.params.id;
-    ai_queries.getById(id, (result) => {
+    user_cv_templates.getById(id, (result) => {
       res.send(result);
     });
   },
 
   insert: (req, res) => {
-    const ai_queries = req.body;
-    ai_queries.insert(ai_queries, (result) => {
+    const user_cv_templates = req.body;
+    user_cv_templates.insert(user_cv_templates, (result) => {
       res.send(result);
     });
   },
 
   update: (req, res) => {
-    const ai_queries = req.body;
+    const user_cv_templates = req.body;
     const id = req.params.id;
-    ai_queries.update(ai_queries, id, (result) => {
+    user_cv_templates.update(user_cv_templates, id, (result) => {
       res.send(result);
     });
   },
 
   delete: (req, res) => {
     const id = req.params.id;
-    ai_queries.delete(id, (result) => {
+    user_cv_templates.delete(id, (result) => {
       res.send(result);
     });
   },

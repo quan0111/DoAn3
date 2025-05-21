@@ -30,6 +30,7 @@ import FeedbackPage from './page/feedback/page'
 import CareerInsightsPage from './page/Carrer-insight/page'
 import PremiumServicesPage from './page/premium/page'
 import AboutContactPage from './page/about/page'
+import ViewCVPage from './page/view-cv/page'
 
 function App() {
   return (
@@ -37,7 +38,7 @@ function App() {
       <Routes>
         {/* Định tuyến cho trang mặc định */}
         <Route path="/" element={<Home />} />
-                <Route path="/quan-ly-phong-van" element={<InterviewManagementPage />} />
+        <Route path="/quan-ly-phong-van" element={<InterviewManagementPage />} />
         <Route path="/Theo-doi-ung-tuyen" element={<ApplicationTrackerPage />} />
         <Route path="/Blog" element={<BlogPage />} />
         <Route path="/Events" element={<EventsPage />} />
@@ -47,7 +48,7 @@ function App() {
         <Route path="/Phan-tich-nghe-nghiep" element={<CareerInsightsPage />} />
         <Route path="/Premium" element={<PremiumServicesPage />} />
         <Route path="/About" element={<AboutContactPage />} />
-        <Route path="/tao-cv" element={<CreateCVPage />} />
+        <Route path="/tao-cv/:id" element={<CreateCVPage />} />
         <Route path="/nha-tuyen-dung" element={<EmployerHomePage />} />
         <Route path="/quan-ly-cv" element={<CVManagementPage />} />
         <Route path="/phan-tich-cv" element={<CVAnalysisPage />} />
@@ -64,6 +65,7 @@ function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/mau-cv" element={<CVTemplatesPage />} />
         <Route path="/mau-cv/:id" element={<CVTemplateDetailPage />} />
+        <Route path="/view-cv/:id" element={<ViewCVPage />} />
         <Route path="/Login" element={<LoginPage />} />
       </Routes>
     </Router>
