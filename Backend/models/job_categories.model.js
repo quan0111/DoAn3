@@ -26,7 +26,14 @@ job_categories.getAll = (callback) => {
     callback(result);
   });
 };
-
+// Lấy tất cả danh mục mà một công việc thuộc về
+job_categories.getCategoriesByJobId = (jobId, callback) => {
+  const sqlString = "SELECT c.* FROM job_categories c JOIN job_category_mapping m ON c.category_id = m.category_id WHERE m.job_id = ?";
+  db.query(sqlString, [jobId], (err, result) => {
+    if (err) return callback(err, null);
+    callback(null, result);
+  });
+};
 job_categories.insert = (job_categories, callBack) => {
   const sqlString = "INSERT INTO job_categories SET ?";
   db.query(sqlString, job_categories, (err, res) => {

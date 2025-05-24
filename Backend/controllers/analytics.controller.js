@@ -1,4 +1,3 @@
-
 const analytics = require("../models/analytics.model");
 
 module.exports = {
@@ -16,16 +15,16 @@ module.exports = {
   },
 
   insert: (req, res) => {
-    const analytics = req.body;
-    analytics.insert(analytics, (result) => {
+    const data = req.body;
+    analytics.insert(data, (result) => {
       res.send(result);
     });
   },
 
   update: (req, res) => {
-    const analytics = req.body;
+    const data = req.body;
     const id = req.params.id;
-    analytics.update(analytics, id, (result) => {
+    analytics.update(data, id, (result) => {
       res.send(result);
     });
   },
@@ -36,4 +35,21 @@ module.exports = {
       res.send(result);
     });
   },
+
+  // ✅ Thêm hàm mới vào đây
+  getAnalyticsWithDetails: (req, res) => {
+    const { entity_type, metric_type } = req.query;
+
+    if (!entity_type) {
+      return res.status(400).json({ message: "Thiếu entity_type" });
+    }
+
+    analytics.getAnalyticsWithDetails(entity_type, metric_type, (err, result) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Lỗi server", error: err.message });
+      }
+      res.send(result);
+    });
+  }
 };

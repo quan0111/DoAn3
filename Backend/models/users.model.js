@@ -18,7 +18,7 @@ const users = (users) => {
 };
 
 users.getById = (id, callback) => {
-  const sqlString = "SELECT * FROM users WHERE id = ? ";
+  const sqlString = "SELECT * FROM users WHERE user_id = ? ";
   db.query(sqlString, id, (err, result) => {
     if (err) {
       return callback(err);
@@ -26,6 +26,17 @@ users.getById = (id, callback) => {
     callback(result);
   });
 };
+users.getByEmail = (email, callback) => {
+  const sqlString = "SELECT * FROM users WHERE email = ?";
+  db.query(sqlString, [email], (err, results) => {
+    if (err) {
+      return callback(err);
+    }
+    // trả về user đầu tiên hoặc null nếu không có
+    callback(null, results.length > 0 ? results[0] : null);
+  });
+};
+
 
 users.getAll = (callback) => {
   const sqlString = "SELECT * FROM users ";
@@ -36,6 +47,28 @@ users.getAll = (callback) => {
     callback(result);
   });
 };
+users.deactivateUser = (userId, callback) => {
+  const sqlString = "UPDATE users SET is_active = 0 WHERE user_id = ?";
+  db.query(sqlString, [userId], (err, res) => {
+    if (err) return callback(err);
+    callback(null, "Đã vô hiệu hóa tài khoản");
+  });
+};
+users.changePassword = (userId, newPasswordHash, callback) => {
+  const sqlString = "UPDATE users SET password_hash = ? WHERE user_id = ?";
+  db.query(sqlString, [newPasswordHash, userId], (err, res) => {
+    if (err) return callback(err);
+    callback(null, "Mật khẩu đã được thay đổi");
+  });
+};
+users.updateLastLogin = (userId, callback) => {
+  const sqlString = "UPDATE users SET last_login = NOW() WHERE user_id = ?";
+  db.query(sqlString, [userId], (err, res) => {
+    if (err) return callback(err);
+    callback(null, "Cập nhật thời gian đăng nhập thành công");
+  });
+};
+
 
 users.insert = (users, callBack) => {
   const sqlString = "INSERT INTO users SET ?";
@@ -49,7 +82,7 @@ users.insert = (users, callBack) => {
 };
 
 users.update = (users, id, callBack) => {
-  const sqlString = "UPDATE users SET ? WHERE id = ?";
+  const sqlString = "UPDATE users SET ? WHERE user_id = ?";
   db.query(sqlString, [users, id], (err, res) => {
     if (err) {
       callBack(err);
@@ -60,7 +93,7 @@ users.update = (users, id, callBack) => {
 };
 
 users.delete = (id, callBack) => {
-  db.query(`DELETE FROM users WHERE id = ?`, id, (err, res) => {
+  db.query(`DELETE FROM users WHERE user_id = ?`, id, (err, res) => {
     if (err) {
       callBack(err);
       return;

@@ -14,7 +14,18 @@ module.exports = {
       res.send(result);
     });
   },
-
+  getCategoriesByJobId: (req, res) => {
+    const id = req.params.id;
+    console.log('job_id:', id);
+    job_categories.getCategoriesByJobId(id, (err, result) => {
+      if (err) {
+        console.error('Error:', err);
+        return res.status(500).json({ error: err.message });
+      }
+      res.json(result);
+    });
+  },
+  
   insert: (req, res) => {
     const job_categories = req.body;
     job_categories.insert(job_categories, (result) => {

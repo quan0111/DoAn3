@@ -8,6 +8,7 @@ export interface job_categories{
   category_id:string;
   name:string;
   description:string;
+  job_count: number;
 }
 
 export interface Job {

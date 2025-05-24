@@ -5,6 +5,7 @@ const job_categoriescontroller = require("../controllers/job_categories.controll
 
 router.get('/', job_categoriescontroller.getAll);
 router.get('/:id', job_categoriescontroller.getById);
+router.get('/by-job/:id', job_categoriescontroller.getCategoriesByJobId);
 router.post('/', job_categoriescontroller.insert);
 router.put('/:id', job_categoriescontroller.update);
 router.delete('/:id', job_categoriescontroller.delete);

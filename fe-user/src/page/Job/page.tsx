@@ -10,11 +10,9 @@ import { JobAlert } from "@/components/job-alert";
 import { JobCard } from "@/components/job-card";
 import { JobsByCategory } from "@/components/Job-by-categories";
 import { Pagination } from "@/components/pagnigation";
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
-import type { Job,job_categories } from "@/lib/types";
-
-
+import type { Job, job_categories } from "@/lib/types";
 
 const popularSearches = [
   "Lập trình viên",
@@ -24,30 +22,31 @@ const popularSearches = [
   "Marketing",
 ];
 
-
-
 export default function JobListPage() {
   const [featuredJobs, setFeaturedJobs] = useState<Job[]>([]);
   const [recentJobs, setRecentJobs] = useState<Job[]>([]);
   const [jobCategories, setJobCategories] = useState<job_categories[]>([]);
+  const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [activeTab, setActiveTab] = useState<string>("all");
 
-    useEffect(() => {
+  useEffect(() => {
     const fetchData = async () => {
       try {
         const [jobsRes, categoriesRes] = await Promise.all([
-          axios.get("http://localhost:3000/jobss"), // endpoint bạn sử dụng
-          axios.get("http://localhost:3000/job_categoriess"),
+          axios.get("http://localhost:3000/jobss"),
+          axios.get("http://localhost:3000/job_category_mappings/count/by-category"),
         ]);
 
         const allJobs: Job[] = jobsRes.data;
         setRecentJobs(allJobs);
-        setFeaturedJobs(allJobs.filter((job) => job.priority_score > 6)); // ví dụ: job nổi bật
+        setFilteredJobs(allJobs);
+        setFeaturedJobs(allJobs.filter((job) => job.priority_score > 6));
+
         setJobCategories([
-        { category_id: "all", name: "Tất cả", description: "" },
-        ...categoriesRes.data,
-      ]);
-
-
+          { category_id: "all", name: "Tất cả", description: "", job_count: 125 },
+          ...categoriesRes.data,
+        ]);
       } catch (error) {
         console.error("Lỗi khi fetch dữ liệu:", error);
       }
@@ -56,11 +55,22 @@ export default function JobListPage() {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    if (selectedCategory !== "all") {
+      axios
+        .get(`http://localhost:3000/jobss/by-category/${selectedCategory}`)
+        .then((res) => setFilteredJobs(res.data));
+      setActiveTab("category");
+    } else {
+      setFilteredJobs(recentJobs);
+      setActiveTab("all");
+    }
+  }, [selectedCategory]);
+
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
       <main className="flex-1">
-        {/* Banner */}
         <section className="bg-green-600 py-12 text-white">
           <div className="container">
             <div className="mx-auto max-w-3xl text-center">
@@ -79,30 +89,33 @@ export default function JobListPage() {
           </div>
         </section>
 
-        {/* Main Content */}
         <section className="py-12">
           <div className="container">
             <div className="grid grid-cols-1 gap-8 lg:grid-cols-4">
-              {/* Sidebar */}
               <div className="lg:col-span-1">
                 <div className="sticky top-24 space-y-6">
-                  <JobCategories job_categories={jobCategories} />
+                  <JobCategories
+                    job_categories={jobCategories}
+                    selectedCategory={selectedCategory}
+                    onCategorySelect={(id) => setSelectedCategory(id)}
+                  />
                   <PopularSearches searches={popularSearches} />
                   <JobAlert />
                 </div>
               </div>
 
-              {/* Job Listings */}
               <div className="lg:col-span-3">
-                <Tabs defaultValue="all" className="w-full">
-                  <TabsList className="mb-6 grid w-full grid-cols-3">
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                  <TabsList className="mb-6 grid w-full grid-cols-4">
                     <TabsTrigger value="all">Tất cả</TabsTrigger>
                     <TabsTrigger value="featured">Việc làm nổi bật</TabsTrigger>
                     <TabsTrigger value="recent">Việc làm mới nhất</TabsTrigger>
+                    <TabsTrigger value="category" disabled={selectedCategory === "all"}>
+                      Theo danh mục
+                    </TabsTrigger>
                   </TabsList>
 
                   <TabsContent value="all" className="space-y-6">
-                    {/* Featured Jobs Section */}
                     <div>
                       <h2 className="mb-4 text-xl font-bold">Việc làm nổi bật</h2>
                       <div className="space-y-4">
@@ -117,7 +130,6 @@ export default function JobListPage() {
                       </div>
                     </div>
 
-                    {/* Recent Jobs Section */}
                     <div>
                       <h2 className="mb-4 text-xl font-bold">Việc làm mới nhất</h2>
                       <div className="space-y-4">
@@ -132,7 +144,6 @@ export default function JobListPage() {
                       </div>
                     </div>
 
-                    {/* Jobs by Category */}
                     <JobsByCategory categories={jobCategories} />
                   </TabsContent>
 
@@ -155,13 +166,21 @@ export default function JobListPage() {
                       <Pagination />
                     </div>
                   </TabsContent>
+
+                  <TabsContent value="category" className="space-y-4">
+                    {filteredJobs.map((job) => (
+                      <JobCard key={`cat-${job.job_id}`} job={job} />
+                    ))}
+                    <div className="mt-8 flex justify-center">
+                      <Pagination />
+                    </div>
+                  </TabsContent>
                 </Tabs>
               </div>
             </div>
           </div>
         </section>
 
-        {/* CTA Section */}
         <section className="bg-green-600 py-12 text-white">
           <div className="container">
             <div className="mx-auto max-w-3xl text-center">

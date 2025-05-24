@@ -34,6 +34,13 @@ jobs.getById = (id, callback) => {
     callback(result);
   });
 };
+  jobs.getJobsByCategoryId = (categoryId, callback) => {
+    const sqlString = " SELECT j.* FROM jobs j JOIN job_category_mapping m ON j.job_id = m.job_id WHERE m.category_id = ? ";
+    db.query(sqlString, [categoryId], (err, result) => {
+      if (err) return callback(err, null);
+      callback(null, result);
+    });
+  };
 
 jobs.getAll = (callback) => {
   const sqlString = "SELECT job_id,jobs.company_id,company_name,logo_url,title,jobs.description,requirements,benefits,salary_min,salary_max,jobs.location,job_level,job_type,status,priority_score,auto_expire,view_count,application_count,jobs.created_at,jobs.updated_at FROM jobs inner join companies on jobs.company_id = companies.company_id";

@@ -15,29 +15,6 @@ module.exports = {
     });
   },
 
-getCategoriesByJobId: (req, res) => {
-  const id = req.params.job_id;
-  console.log('job_id:', id);
-  job_category_mappingModel.getCategoriesByJobId(id, (err, result) => {
-    if (err) {
-      console.error('Error:', err);
-      return res.status(500).json({ error: err.message });
-    }
-    res.json(result);
-  });
-},
-
-getJobsByCategoryId: (req, res) => {
-  const id = req.params.category_id;
-  console.log('category_id:', id);
-  job_category_mappingModel.getJobsByCategoryId(id, (err, result) => {
-    if (err) {
-      console.error('Error:', err);
-      return res.status(500).json({ error: err.message });
-    }
-    res.json(result);
-  });
-},
 
   insert: (req, res) => {
     const data = req.body;

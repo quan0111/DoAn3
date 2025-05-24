@@ -19,7 +19,7 @@ const resumes = (resumes) => {
 };
 
 resumes.getById = (id, callback) => {
-  const sqlString = "SELECT * FROM resumes WHERE id = ? ";
+  const sqlString = "SELECT * FROM resumes WHERE resume_id = ? ";
   db.query(sqlString, id, (err, result) => {
     if (err) {
       return callback(err);
@@ -50,7 +50,7 @@ resumes.insert = (resumes, callBack) => {
 };
 
 resumes.update = (resumes, id, callBack) => {
-  const sqlString = "UPDATE resumes SET ? WHERE id = ?";
+  const sqlString = "UPDATE resumes SET ? WHERE resume_id = ?";
   db.query(sqlString, [resumes, id], (err, res) => {
     if (err) {
       callBack(err);
@@ -61,7 +61,7 @@ resumes.update = (resumes, id, callBack) => {
 };
 
 resumes.delete = (id, callBack) => {
-  db.query(`DELETE FROM resumes WHERE id = ?`, id, (err, res) => {
+  db.query(`DELETE FROM resumes WHERE resume_id = ?`, id, (err, res) => {
     if (err) {
       callBack(err);
       return;

@@ -26,32 +26,8 @@ job_category_mapping.getAll = (callback) => {
 };
 
 // Lấy tất cả công việc thuộc một danh mục cụ thể
-job_category_mapping.getJobsByCategoryId = (categoryId, callback) => {
-  const sqlString = `
-    SELECT j.*
-    FROM jobs j
-    JOIN job_category_mapping m ON j.job_id = m.job_id
-    WHERE m.category_id = ?
-  `;
-  db.query(sqlString, [categoryId], (err, result) => {
-    if (err) return callback(err, null);
-    callback(null, result);
-  });
-};
 
-// Lấy tất cả danh mục mà một công việc thuộc về
-job_category_mapping.getCategoriesByJobId = (jobId, callback) => {
-  const sqlString = `
-    SELECT c.*
-    FROM job_categories c
-    JOIN job_category_mapping m ON c.category_id = m.category_id
-    WHERE m.job_id = ?
-  `;
-  db.query(sqlString, [jobId], (err, result) => {
-    if (err) return callback(err, null);
-    callback(null, result);
-  });
-};
+
 
 // Đếm số lượng công việc trong từng danh mục
 job_category_mapping.countJobsByCategory = (callback) => {

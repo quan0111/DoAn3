@@ -9,6 +9,7 @@ const port = 3000; // Đây là cổng bạn cần biết
 
 
 // Require các router
+var authRouter = require('./routes/auth.route');
 var indexRouter = require('./routes/index');
 var advertisementsRouter = require('./routes/advertisements.route');
 var analyticsRouter = require('./routes/analytics.route');
@@ -53,6 +54,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Đăng ký các router
+app.use('/auth',authRouter)
 app.use('/', indexRouter);
 app.use('/advertisementss', advertisementsRouter);
 app.use('/analyticss', analyticsRouter);
