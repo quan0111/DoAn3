@@ -32,17 +32,18 @@ interface Job {
 
 interface JobCardProps {
   job: Job;
+  onClick?: () => void;
 }
 
-export const JobCard: React.FC<JobCardProps> = ({ job }) => {
+export const JobCard: React.FC<JobCardProps> = ({ job,onClick }) => {
   const formatSalary = (min: number, max: number): string => {
     return `${min.toLocaleString("vi-VN") + "00.000"} - ${max.toLocaleString("vi-VN") + "00.000"}₫`;
   };
 
   return (
-    <Link
-      to={`/viec-lam/${job.job_id}`}
+    <div
       className="block rounded-lg border bg-white p-4 shadow-sm transition-all hover:shadow-md"
+      onClick={onClick}
     >
       <div className="flex gap-4">
         {/* Logo công ty */}
@@ -107,6 +108,6 @@ export const JobCard: React.FC<JobCardProps> = ({ job }) => {
           </div>
         </div>
       </div>
-    </Link>
+    </div>
   );
 };

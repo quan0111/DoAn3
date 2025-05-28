@@ -30,6 +30,7 @@ export interface Job {
   priority_score: number;
   auto_expire: number;
   view_count: number;
+  education_level:string;
   application_count: number;
   created_at: Date;
   updated_at: Date;

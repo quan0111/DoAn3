@@ -1,12 +1,49 @@
-import { Header } from "@/components/Header"
-import { Footer } from "@/components/footer"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Link } from "react-router-dom"
-import { ArrowRight, Mail, LockKeyhole, User, Briefcase } from "lucide-react"
+import { Header } from "@/components/Header";
+import { useState } from "react";
+import { Footer } from "@/components/footer";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Link } from "react-router-dom";
+import { ArrowRight, Mail, LockKeyhole, User, Briefcase } from "lucide-react";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
 
 export default function RegisterPage() {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [phone, setPhone] = useState("");
+  const [gender, setGender] = useState("");
+  // Sửa ở đây: đổi null -> undefined
+  const [dob, setDob] = useState<Date | undefined>(undefined);
+  const [role, setRole] = useState<"jobseeker" | "employer">("jobseeker");
+  const [agreeTerms, setAgreeTerms] = useState(false);
+
+const DatePicker = () => {
+  // Lấy giá trị dạng yyyy-MM-dd để set cho input type="date"x
+  const dobValue = dob ? dob.toISOString().substring(0, 10) : "";
+
+  return (
+    <input
+      type="date"
+      className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-green-600"
+      value={dobValue}
+      onChange={(e) => {
+        const dateStr = e.target.value;
+        setDob(dateStr ? new Date(dateStr) : undefined);
+      }}
+      max={new Date().toISOString().substring(0, 10)} // không chọn ngày trong tương lai
+    />
+  );
+};
+
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
@@ -22,9 +59,12 @@ export default function RegisterPage() {
                 className="h-full w-full object-cover opacity-50"
               />
               <div className="absolute inset-0 flex flex-col items-center justify-center p-12 text-white">
-                <h2 className="mb-6 text-3xl font-bold">Bắt đầu hành trình nghề nghiệp của bạn!</h2>
+                <h2 className="mb-6 text-3xl font-bold">
+                  Bắt đầu hành trình nghề nghiệp của bạn!
+                </h2>
                 <p className="mb-8 text-center text-lg">
-                  Tạo tài khoản miễn phí để tiếp cận hàng nghìn cơ hội việc làm và công cụ xây dựng CV chuyên nghiệp.
+                  Tạo tài khoản miễn phí để tiếp cận hàng nghìn cơ hội việc làm
+                  và công cụ xây dựng CV chuyên nghiệp.
                 </p>
                 <div className="mb-8 space-y-4">
                   {[
@@ -52,33 +92,56 @@ export default function RegisterPage() {
             <div className="mx-auto flex max-w-md flex-col justify-center space-y-6 p-4 md:p-8">
               <div className="text-center lg:text-left">
                 <h1 className="text-3xl font-bold">Đăng ký tài khoản</h1>
-                <p className="mt-2 text-gray-500">Tạo tài khoản miễn phí để bắt đầu hành trình nghề nghiệp</p>
+                <p className="mt-2 text-gray-500">
+                  Tạo tài khoản miễn phí để bắt đầu hành trình nghề nghiệp
+                </p>
               </div>
 
               <div className="grid gap-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
-                    <label htmlFor="firstName" className="text-sm font-medium">
+                    <label
+                      htmlFor="firstName"
+                      className="text-sm font-medium text-left"
+                    >
                       Họ
                     </label>
                     <div className="relative">
                       <User className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-                      <Input id="firstName" placeholder="Nguyễn" className="pl-10" />
+                      <Input
+                        id="firstName"
+                        placeholder="Nguyễn"
+                        className="pl-10"
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                      />
                     </div>
                   </div>
                   <div className="grid gap-2">
-                    <label htmlFor="lastName" className="text-sm font-medium">
+                    <label
+                      htmlFor="lastName"
+                      className="text-sm font-medium text-left"
+                    >
                       Tên
                     </label>
                     <div className="relative">
                       <User className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-                      <Input id="lastName" placeholder="Văn A" className="pl-10" />
+                      <Input
+                        id="lastName"
+                        placeholder="Văn A"
+                        className="pl-10"
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                      />
                     </div>
                   </div>
                 </div>
 
                 <div className="grid gap-2">
-                  <label htmlFor="email" className="text-sm font-medium">
+                  <label
+                    htmlFor="email"
+                    className="text-sm font-medium text-left"
+                  >
                     Email
                   </label>
                   <div className="relative">
@@ -89,38 +152,119 @@ export default function RegisterPage() {
                       type="email"
                       className="pl-10"
                       autoComplete="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <div className="grid gap-2">
+                  <label
+                    htmlFor="phone"
+                    className="text-sm font-medium text-left"
+                  >
+                    Số điện thoại
+                  </label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                    <Input
+                      id="phone"
+                      placeholder="0123 456 789"
+                      type="tel"
+                      className="pl-10"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
                     />
                   </div>
                 </div>
 
                 <div className="grid gap-2">
-                  <label htmlFor="password" className="text-sm font-medium">
-                    Mật khẩu
+                  <label
+                    htmlFor="gender"
+                    className="text-sm font-medium text-left"
+                  >
+                    Giới tính
                   </label>
-                  <div className="relative">
-                    <LockKeyhole className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-                    <Input id="password" type="password" className="pl-10" autoComplete="new-password" />
+                  <select
+                    id="gender"
+                    className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-green-600"
+                    value={gender}
+                    onChange={(e) => setGender(e.target.value)}
+                  >
+                    <option value="">Chọn giới tính</option>
+                    <option value="male">Nam</option>
+                    <option value="female">Nữ</option>
+                    <option value="other">Khác</option>
+                  </select>
+                </div>
+
+                <div className="relative">
+                  <div className="grid gap-2">
+                    <label
+                      htmlFor="dob"
+                      className="text-sm font-medium text-left"
+                    >
+                      Ngày sinh
+                    </label>
+                    <DatePicker />
                   </div>
                 </div>
 
                 <div className="grid gap-2">
-                  <label htmlFor="confirmPassword" className="text-sm font-medium">
+                  <label
+                    htmlFor="password"
+                    className="text-sm font-medium text-left"
+                  >
+                    Mật khẩu
+                  </label>
+                  <div className="relative">
+                    <LockKeyhole className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                    <Input
+                      id="password"
+                      type="password"
+                      className="pl-10"
+                      autoComplete="new-password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <div className="grid gap-2">
+                  <label
+                    htmlFor="confirmPassword"
+                    className="text-sm font-medium text-left"
+                  >
                     Xác nhận mật khẩu
                   </label>
                   <div className="relative">
                     <LockKeyhole className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-                    <Input id="confirmPassword" type="password" className="pl-10" autoComplete="new-password" />
+                    <Input
+                      id="confirmPassword"
+                      type="password"
+                      className="pl-10"
+                      autoComplete="new-password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                    />
                   </div>
                 </div>
 
                 <div className="grid gap-2">
                   <label className="text-sm font-medium">Bạn là</label>
                   <div className="grid grid-cols-2 gap-4">
-                    <Button variant="outline" className="justify-start">
+                    <Button
+                      variant={role === "jobseeker" ? "default" : "outline"}
+                      className="justify-start"
+                      onClick={() => setRole("jobseeker")}
+                    >
                       <User className="mr-2 h-5 w-5" />
                       Người tìm việc
                     </Button>
-                    <Button variant="outline" className="justify-start">
+                    <Button
+                      variant={role === "employer" ? "default" : "outline"}
+                      className="justify-start"
+                      onClick={() => setRole("employer")}
+                    >
                       <Briefcase className="mr-2 h-5 w-5" />
                       Nhà tuyển dụng
                     </Button>
@@ -128,7 +272,12 @@ export default function RegisterPage() {
                 </div>
 
                 <div className="flex items-center space-x-2">
-                  <Checkbox id="terms" />
+                  <Checkbox
+                    id="terms"
+                    checked={agreeTerms}
+                    onCheckedChange={(value) => setAgreeTerms(!!value)}
+                  />
+
                   <label htmlFor="terms" className="text-sm text-gray-500">
                     Tôi đồng ý với{" "}
                     <Link to="/" className="text-green-600 hover:underline">
@@ -141,7 +290,28 @@ export default function RegisterPage() {
                   </label>
                 </div>
 
-                <Button className="bg-green-600 hover:bg-green-700">
+                <Button
+                  className="bg-green-600 hover:bg-green-700"
+                  onClick={() => {
+                    if (!agreeTerms)
+                      return alert("Bạn cần đồng ý với điều khoản.");
+                    if (password !== confirmPassword)
+                      return alert("Mật khẩu không khớp.");
+                    // Gửi dữ liệu
+                    const userData = {
+                      firstName,
+                      lastName,
+                      email,
+                      password,
+                      phone,
+                      gender,
+                      dob,
+                      role,
+                    };
+                    console.log("Dữ liệu đăng ký:", userData);
+                    // TODO: Gọi API đăng ký tại đây
+                  }}
+                >
                   Đăng ký <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </div>
@@ -151,7 +321,9 @@ export default function RegisterPage() {
                   <span className="w-full border-t"></span>
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-background px-2 text-gray-500">Hoặc đăng ký với</span>
+                  <span className="bg-background px-2 text-gray-500">
+                    Hoặc đăng ký với
+                  </span>
                 </div>
               </div>
 
@@ -178,18 +350,15 @@ export default function RegisterPage() {
                   Google
                 </Button>
                 <Button variant="outline">
-                  <svg className="mr-2 h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                  <svg
+                    className="mr-2 h-4 w-4"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     <path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z" />
                   </svg>
                   Facebook
                 </Button>
-              </div>
-
-              <div className="mt-4 text-center text-sm lg:hidden">
-                Bạn đã có tài khoản?{" "}
-                <Link to="/dang-nhap" className="font-medium text-green-600 hover:underline">
-                  Đăng nhập
-                </Link>
               </div>
             </div>
           </div>
@@ -197,5 +366,5 @@ export default function RegisterPage() {
       </main>
       <Footer />
     </div>
-  )
+  );
 }

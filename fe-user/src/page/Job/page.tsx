@@ -2,7 +2,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/footer";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Link } from "react-router-dom";
+import { Link,useNavigate } from "react-router-dom";
 import { ChevronRight, ArrowRight } from "lucide-react";
 import { JobCategories } from "@/components/job-categories";
 import { PopularSearches } from "@/components/popular-search";
@@ -29,7 +29,7 @@ export default function JobListPage() {
   const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [activeTab, setActiveTab] = useState<string>("all");
-
+  const navigate = useNavigate()
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -66,6 +66,9 @@ export default function JobListPage() {
       setActiveTab("all");
     }
   }, [selectedCategory]);
+  const HandleJobClick = (JobId: string ) =>{
+    navigate(`/viec-lam/${JobId}`)
+  };
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -120,7 +123,7 @@ export default function JobListPage() {
                       <h2 className="mb-4 text-xl font-bold">Việc làm nổi bật</h2>
                       <div className="space-y-4">
                         {featuredJobs.map((job) => (
-                          <JobCard key={job.job_id} job={job} />
+                          <JobCard key={job.job_id} job={job} onClick={() => HandleJobClick(job.job_id)}/>
                         ))}
                       </div>
                       <div className="mt-4 flex justify-end">
@@ -134,7 +137,7 @@ export default function JobListPage() {
                       <h2 className="mb-4 text-xl font-bold">Việc làm mới nhất</h2>
                       <div className="space-y-4">
                         {recentJobs.slice(0, 5).map((job) => (
-                          <JobCard key={job.job_id} job={job} />
+                          <JobCard key={job.job_id} job={job} onClick={() => HandleJobClick(job.job_id)}/>
                         ))}
                       </div>
                       <div className="mt-4 flex justify-end">
@@ -149,7 +152,7 @@ export default function JobListPage() {
 
                   <TabsContent value="featured" className="space-y-4">
                     {featuredJobs.map((job) => (
-                      <JobCard key={`featured-${job.job_id}`} job={job} />
+                      <JobCard key={`featured-${job.job_id}`} job={job}  onClick={() => HandleJobClick(job.job_id)}/>
                     ))}
                     <div className="mt-8 flex justify-center">
                       <Button variant="outline" className="border-green-600 text-green-600 hover:bg-green-50">
@@ -160,7 +163,7 @@ export default function JobListPage() {
 
                   <TabsContent value="recent" className="space-y-4">
                     {recentJobs.map((job) => (
-                      <JobCard key={`recent-${job.job_id}`} job={job} />
+                      <JobCard key={`recent-${job.job_id}`} job={job} onClick={() => HandleJobClick(job.job_id)}/>
                     ))}
                     <div className="mt-8 flex justify-center">
                       <Pagination />
@@ -169,7 +172,7 @@ export default function JobListPage() {
 
                   <TabsContent value="category" className="space-y-4">
                     {filteredJobs.map((job) => (
-                      <JobCard key={`cat-${job.job_id}`} job={job} />
+                      <JobCard key={`cat-${job.job_id}`} job={job} onClick={() => HandleJobClick(job.job_id)}/>
                     ))}
                     <div className="mt-8 flex justify-center">
                       <Pagination />

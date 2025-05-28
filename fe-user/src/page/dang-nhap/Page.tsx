@@ -3,10 +3,43 @@ import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
+import Cookies from "js-cookie"
 import { ArrowRight, Mail, LockKeyhole } from "lucide-react"
+import { useState } from "react"
+import axios from "axios"
 
 export default function LoginPage() {
+
+  const [email,setEmail] = useState("");
+  const [password,setPassword] = useState("");
+  const [loading,setloading] = useState(false);
+  const [error,setError] = useState("")
+  const navigate = useNavigate()
+    const handleLogin = async () => {
+      setloading(true);
+      setError("");
+
+      try {
+        const response = await axios.post("http://localhost:3000/auth/", {
+          email,
+          password,
+        });
+
+        const data = response.data;
+
+        // Lưu token vào localStorage
+        Cookies.set("token", data.token);
+        // Điều hướng về trang chính
+        navigate("/");
+      } catch (err: any) {
+        setError(err.response?.data?.message || "Đăng nhập thất bại");
+      } finally {
+        setloading(false);
+      }
+    };
+
+
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
@@ -57,7 +90,7 @@ export default function LoginPage() {
 
               <div className="grid gap-4">
                 <div className="grid gap-2">
-                  <label htmlFor="email" className="text-sm font-medium">
+                  <label htmlFor="email" className="text-sm font-medium text-left">
                     Email
                   </label>
                   <div className="relative">
@@ -68,7 +101,10 @@ export default function LoginPage() {
                       type="email"
                       className="pl-10"
                       autoComplete="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
                     />
+
                   </div>
                 </div>
 
@@ -83,7 +119,14 @@ export default function LoginPage() {
                   </div>
                   <div className="relative">
                     <LockKeyhole className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-                    <Input id="password" type="password" className="pl-10" autoComplete="current-password" />
+                    <Input
+                      id="password"
+                      type="password"
+                      className="pl-10"
+                      autoComplete="current-password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      />
                   </div>
                 </div>
 
@@ -94,9 +137,15 @@ export default function LoginPage() {
                   </label>
                 </div>
 
-                <Button className="bg-green-600 hover:bg-green-700">
-                  Đăng nhập <ArrowRight className="ml-2 h-4 w-4" />
+                <Button
+                  onClick={handleLogin}
+                  className="bg-green-600 hover:bg-green-700"
+                  disabled={loading}
+                >
+                  {loading ? "Đang đăng nhập..." : "Đăng nhập"}
+                  <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
+                {error && <p className="text-sm text-red-500">{error}</p>}
               </div>
 
               <div className="relative">

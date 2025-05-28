@@ -23,10 +23,11 @@ const jobs = (jobs) => {
   this.application_count = jobs.application_count;
   this.created_at = jobs.created_at;
   this.updated_at = jobs.updated_at;
+  this.education_level = jobs.education_level
 };
 
 jobs.getById = (id, callback) => {
-  const sqlString = "SELECT job_id,jobs.company_id,company_name,logo_url,title,jobs.description,requirements,benefits,salary_min,salary_max,jobs.location,job_level,job_type,status,priority_score,auto_expire,view_count,application_count,jobs.created_at,jobs.updated_at FROM jobs inner join companies on jobs.company_id = companies.company_id WHERE job_id = ?";
+  const sqlString = "SELECT job_id,jobs.company_id,company_name,logo_url,title,jobs.description,education_level,requirements,benefits,salary_min,salary_max,jobs.location,job_level,job_type,status,priority_score,auto_expire,view_count,application_count,jobs.created_at,jobs.updated_at FROM jobs inner join companies on jobs.company_id = companies.company_id WHERE job_id = ?";
   db.query(sqlString, id, (err, result) => {
     if (err) {
       return callback(err);

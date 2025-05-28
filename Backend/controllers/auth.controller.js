@@ -31,14 +31,14 @@ module.exports = {
       });
 
       const token = jwt.sign(
-        { userId: user.user_id, email: user.email },
+        { userId: user.user_id, email: user.email, role :user.role },
         SECRET_KEY,
         { expiresIn: "1h" }
       );
 
       res.json({
         token,
-        user: { id: user.user_id, email: user.email, name: user.full_name },
+        user: { id: user.user_id, email: user.email, role: user.role },
       });
     });
   },

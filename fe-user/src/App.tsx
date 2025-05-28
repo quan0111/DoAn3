@@ -48,7 +48,7 @@ function App() {
         <Route path="/Phan-tich-nghe-nghiep" element={<CareerInsightsPage />} />
         <Route path="/Premium" element={<PremiumServicesPage />} />
         <Route path="/About" element={<AboutContactPage />} />
-        <Route path="/tao-cv/:id" element={<CreateCVPage />} />
+        <Route path="/tao-cv" element={<CreateCVPage />} />
         <Route path="/nha-tuyen-dung" element={<EmployerHomePage />} />
         <Route path="/quan-ly-cv" element={<CVManagementPage />} />
         <Route path="/phan-tich-cv" element={<CVAnalysisPage />} />
@@ -62,7 +62,7 @@ function App() {
         <Route path="/nha-tuyen-dung/dang-tin" element={<PostJobPage />} />
         <Route path="/viec-lam" element={<JobListPage />} />
         <Route path="/viec-lam/:id" element={<JobDetailPage />} />
-        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/dang-ky" element={<RegisterPage />} />
         <Route path="/mau-cv" element={<CVTemplatesPage />} />
         <Route path="/mau-cv/:id" element={<CVTemplateDetailPage />} />
         <Route path="/view-cv/:id" element={<ViewCVPage />} />

@@ -1,39 +1,13 @@
-import { CVEditor } from "@/components/cv-editor"
+import { CVEditor } from "@/components/cv-editor/cv-editor"
+import { Header } from "@/components/Header"
+import { Footer } from "react-day-picker"
+import { CVImportSection } from "@/components/cv-import"
 
-export default function Home() {
+export default function CVCreatePage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white border-b border-gray-200">
-        <div className="container mx-auto px-4 py-2 flex items-center">
-          <div className="flex items-center">
-            <div className="text-emerald-600 font-bold text-2xl mr-2">topCV</div>
-            <span className="text-xs text-gray-500">Tiếp lợi thế - Nối thành công</span>
-          </div>
-          <nav className="ml-10 hidden md:flex space-x-1">
-            <div className="px-3 py-2 text-gray-700 hover:text-emerald-600 flex items-center cursor-pointer">
-              Việc làm <span className="ml-1">▼</span>
-            </div>
-            <div className="px-3 py-2 text-gray-700 hover:text-emerald-600 flex items-center cursor-pointer">
-              Tạo CV <span className="ml-1">▼</span>
-            </div>
-            <div className="px-3 py-2 text-gray-700 hover:text-emerald-600 flex items-center cursor-pointer">
-              Công cụ <span className="ml-1">▼</span>
-            </div>
-            <div className="px-3 py-2 text-gray-700 hover:text-emerald-600 flex items-center cursor-pointer">
-              Cẩm nang nghề nghiệp <span className="ml-1">▼</span>
-            </div>
-            <div className="px-3 py-2 flex items-center">
-              <span className="text-gray-700">TopCV</span>
-              <span className="ml-1 px-2 py-0.5 bg-amber-500 text-white text-xs rounded-full">Pro</span>
-            </div>
-          </nav>
-          <div className="ml-auto flex items-center space-x-4">
-            <div className="text-sm text-gray-700">Bạn là nhà tuyển dụng?</div>
-            <button className="bg-white text-emerald-600 border border-emerald-600 px-3 py-1 rounded flex items-center text-sm font-medium">
-              Đăng tuyển ngay <span className="ml-1">»</span>
-            </button>
-          </div>
-        </div>
+                <Header></Header>
       </header>
 
       <div className="border-b border-gray-200 bg-white">
@@ -91,6 +65,7 @@ export default function Home() {
       <main>
         <CVEditor />
       </main>
+      <Footer></Footer>
     </div>
   )
 }
