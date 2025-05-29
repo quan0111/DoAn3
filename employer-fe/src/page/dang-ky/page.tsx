@@ -13,22 +13,10 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Command, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-// Interface cho dữ liệu người dùng
-interface UserData {
-  user_id?: number;
-  fullname: string;
-  email: string;
-  password: string;
-  phone: string;
-  gender: string;
-  dob: string;
-  role: string;
-}
-
 export default function EmployerCompanyInfoPage() {
   const navigate = useNavigate();
 
-  // State để lưu dữ liệu form công ty
+  // State để lưu dữ liệu form
   const [formData, setFormData] = useState({
     company_name: "",
     description: "",
@@ -37,17 +25,6 @@ export default function EmployerCompanyInfoPage() {
     location: "",
     company_size: "",
     industries: [] as string[],
-  });
-
-  // State để lưu dữ liệu form người dùng
-  const [userFormData, setUserFormData] = useState({
-    fullname: "",
-    email: "",
-    password: "",
-    phone: "",
-    gender: "",
-    dob: "",
-    role: "employer",
   });
 
   // State để hiển thị preview ảnh logo
@@ -71,26 +48,15 @@ export default function EmployerCompanyInfoPage() {
     "Khác",
   ];
 
-  // Hàm xử lý thay đổi input cho form công ty
+  // Hàm xử lý thay đổi input
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Hàm xử lý thay đổi input cho form người dùng
-  const handleUserChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setUserFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
   // Hàm xử lý thay đổi select
   const handleSelectChange = (name: string, value: string) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  // Hàm xử lý thay đổi select cho người dùng
-  const handleUserSelectChange = (name: string, value: string) => {
-    setUserFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   // Hàm xử lý chọn file logo
@@ -118,65 +84,16 @@ export default function EmployerCompanyInfoPage() {
     });
   };
 
-  // Hàm tạo người dùng mới qua API
-  const createUser = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      const userData = {
-        ...userFormData,
-        dob: new Date(userFormData.dob).toISOString(), // Chuyển đổi dob thành chuỗi ISO
-      };
-
-      const response = await axios.post("http://localhost:3000/userss", userData);
-
-      if (response.status === 201) {
-        const userId = response.data.id; // Giả sử API trả về user_id trong response
-        const savedUserData: UserData = {
-          ...userData,
-          user_id: userId,
-        };
-
-        // Lưu vào localStorage
-        localStorage.setItem("userData", JSON.stringify(savedUserData));
-        toast.success("Người dùng đã được tạo thành công!");
-      }
-    } catch (error) {
-      console.error("Lỗi khi tạo người dùng:", error);
-      toast.error("Đã có lỗi xảy ra khi tạo người dùng. Vui lòng thử lại.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Hàm xử lý submit form công ty
+  // Hàm xử lý submit form
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      // Lấy userData từ localStorage
-      const storedUserData = localStorage.getItem("userData");
-      if (!storedUserData) {
-        toast.error("Vui lòng tạo người dùng trước khi thêm công ty!");
-        setLoading(false);
-        return;
-      }
-
-      const userData: UserData = JSON.parse(storedUserData);
-      const userId = userData.user_id;
-
-      if (!userId) {
-        toast.error("Không tìm thấy user_id. Vui lòng đăng nhập lại!");
-        setLoading(false);
-        return;
-      }
-
-      const response = await axios.post("http://localhost:3000/companiess", {
+      const response = await axios.post("http://localhost:3000/companies", {
         ...formData,
         industry: formData.industries.join(", "),
-        user_id: userId,
+        user_id: 1,
         verified: false,
       });
 
@@ -186,7 +103,7 @@ export default function EmployerCompanyInfoPage() {
       }
     } catch (error) {
       console.error("Lỗi khi lưu thông tin công ty:", error);
-      toast.error("Đã có lỗi xảy ra khi lưu công ty. Vui lòng thử lại.");
+      toast.error("Đã có lỗi xảy ra. Vui lòng thử lại.");
     } finally {
       setLoading(false);
     }
@@ -236,113 +153,10 @@ export default function EmployerCompanyInfoPage() {
             {/* Company Info Form */}
             <div className="mx-auto flex max-w-md flex-col justify-center space-y-6 p-4 md:p-8">
               <div className="text-center lg:text-left">
-                <h1 className="text-3xl font-bold">Nhập thông tin người dùng và công ty</h1>
+                <h1 className="text-3xl font-bold">Nhập thông tin công ty</h1>
                 <p className="mt-2 text-gray-500">Cung cấp thông tin để bắt đầu quản lý công ty của bạn</p>
               </div>
 
-              {/* Form tạo người dùng */}
-              <form onSubmit={createUser} className="grid gap-4">
-                <div className="grid gap-2">
-                  <label htmlFor="fullname" className="text-sm font-medium text-left">
-                    Họ và tên
-                  </label>
-                  <Input
-                    id="fullname"
-                    name="fullname"
-                    placeholder="Nguyễn Văn A"
-                    value={userFormData.fullname}
-                    onChange={handleUserChange}
-                    required
-                  />
-                </div>
-
-                <div className="grid gap-2">
-                  <label htmlFor="email" className="text-sm font-medium text-left">
-                    Email
-                  </label>
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    placeholder="example@domain.com"
-                    value={userFormData.email}
-                    onChange={handleUserChange}
-                    required
-                  />
-                </div>
-
-                <div className="grid gap-2">
-                  <label htmlFor="password" className="text-sm font-medium text-left">
-                    Mật khẩu
-                  </label>
-                  <Input
-                    id="password"
-                    name="password"
-                    type="password"
-                    placeholder="Nhập mật khẩu"
-                    value={userFormData.password}
-                    onChange={handleUserChange}
-                    required
-                  />
-                </div>
-
-                <div className="grid gap-2">
-                  <label htmlFor="phone" className="text-sm font-medium text-left">
-                    Số điện thoại
-                  </label>
-                  <Input
-                    id="phone"
-                    name="phone"
-                    placeholder="0123456789"
-                    value={userFormData.phone}
-                    onChange={handleUserChange}
-                    required
-                  />
-                </div>
-
-                <div className="grid gap-2">
-                  <label htmlFor="gender" className="text-sm font-medium text-left">
-                    Giới tính
-                  </label>
-                  <Select
-                    onValueChange={(value) => handleUserSelectChange("gender", value)}
-                    value={userFormData.gender}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Chọn giới tính" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Nam">Nam</SelectItem>
-                      <SelectItem value="Nữ">Nữ</SelectItem>
-                      <SelectItem value="Khác">Khác</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="grid gap-2">
-                  <label htmlFor="dob" className="text-sm font-medium text-left">
-                    Ngày sinh
-                  </label>
-                  <Input
-                    id="dob"
-                    name="dob"
-                    type="date"
-                    value={userFormData.dob}
-                    onChange={handleUserChange}
-                    required
-                  />
-                </div>
-
-                <Button
-                  type="submit"
-                  className="bg-blue-600 hover:bg-blue-700"
-                  disabled={loading}
-                >
-                  {loading ? "Đang tạo..." : "Tạo người dùng"}
-                </Button>
-              </form>
-
-              {/* Form tạo công ty */}
               <form onSubmit={handleSubmit} className="grid gap-4">
                 {/* Logo Upload */}
                 <div className="grid gap-2">
@@ -540,7 +354,7 @@ export default function EmployerCompanyInfoPage() {
                   className="bg-green-600 hover:bg-green-700"
                   disabled={loading}
                 >
-                  {loading ? "Đang lưu..." : "Lưu thông tin công ty"}
+                  {loading ? "Đang lưu..." : "Lưu thông tin"}
                 </Button>
               </form>
 

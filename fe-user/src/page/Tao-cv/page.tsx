@@ -1,6 +1,6 @@
 import { CVEditor } from "@/components/cv-editor/cv-editor"
 import { Header } from "@/components/Header"
-import { Footer } from "react-day-picker"
+import { Footer } from "@/components/footer"
 import { CVImportSection } from "@/components/cv-import"
 
 export default function CVCreatePage() {

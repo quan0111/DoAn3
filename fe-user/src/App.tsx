@@ -5,18 +5,13 @@ import JobDetailPage from './page/Job/ID/page'
 import JobListPage from './page/Job/page'
 import RegisterPage from './page/dang-ky/page'
 import LoginPage from './page/dang-nhap/Page'
-import './App.css'
+import "App.css"
 import CVTemplatesPage from './page/CV/Page'
 import CVTemplateDetailPage from './page/CV/ID/page'
-import EmployerHomePage from './page/Nha-tuyen-dung/page'
 import CreateCVPage from './page/Tao-cv/page'
-import EmployerLoginPage from './page/Nha-tuyen-dung/dang-nhap/page'
-import EmployerRegisterPage from './page/Nha-tuyen-dung/dang-ky/page'
-import PostJobPage from './page/Nha-tuyen-dung/dang-tin/page'
 import CVAnalysisPage from './page/phan-tich-cv/page'
 import CVManagementPage from './page/quan-ly-cv/page'
 import JobMatchPage from './page/so-sanh-mo-ta-cong-viec/page'
-import EmployerDashboardPage from './page/Nha-tuyen-dung/Bang-dieu-khien/page'
 import CandidateSearchPage from './page/Tim-kiem-ung-vien/page'
 import ProfilePage from './page/Ho-so-nguoi-dung/page'
 import CandidateDashboardPage from './page/Bang-dieu-khien/page'
@@ -49,17 +44,12 @@ function App() {
         <Route path="/Premium" element={<PremiumServicesPage />} />
         <Route path="/About" element={<AboutContactPage />} />
         <Route path="/tao-cv" element={<CreateCVPage />} />
-        <Route path="/nha-tuyen-dung" element={<EmployerHomePage />} />
         <Route path="/quan-ly-cv" element={<CVManagementPage />} />
         <Route path="/phan-tich-cv" element={<CVAnalysisPage />} />
         <Route path="/Ho-so-nguoi-dung" element={<ProfilePage />} />
         <Route path="/Bang-dieu-khien" element={<CandidateDashboardPage />} />
         <Route path="/so-sanh-mo-ta-cong-viec" element={<JobMatchPage />} />
-        <Route path="/nha-tuyen-dung/dang-nhap" element={<EmployerLoginPage />} />
         <Route path="/Tim-kiem-ung-vien" element={<CandidateSearchPage />} />
-        <Route path="/nha-tuyen-dung/Bang-dieu-khien" element={<EmployerDashboardPage />} />
-        <Route path="/nha-tuyen-dung/dang-ky" element={<EmployerRegisterPage />} />
-        <Route path="/nha-tuyen-dung/dang-tin" element={<PostJobPage />} />
         <Route path="/viec-lam" element={<JobListPage />} />
         <Route path="/viec-lam/:id" element={<JobDetailPage />} />
         <Route path="/dang-ky" element={<RegisterPage />} />
