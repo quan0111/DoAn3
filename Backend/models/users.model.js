@@ -26,17 +26,6 @@ users.getById = (id, callback) => {
     callback(result);
   });
 };
-users.getByEmail = (email, callback) => {
-  const sqlString = "SELECT * FROM users WHERE email = ?";
-  db.query(sqlString, [email], (err, results) => {
-    if (err) {
-      return callback(err);
-    }
-    // trả về user đầu tiên hoặc null nếu không có
-    callback(null, results.length > 0 ? results[0] : null);
-  });
-};
-
 
 users.getAll = (callback) => {
   const sqlString = "SELECT * FROM users ";
@@ -47,28 +36,6 @@ users.getAll = (callback) => {
     callback(result);
   });
 };
-users.deactivateUser = (userId, callback) => {
-  const sqlString = "UPDATE users SET is_active = 0 WHERE user_id = ?";
-  db.query(sqlString, [userId], (err, res) => {
-    if (err) return callback(err);
-    callback(null, "Đã vô hiệu hóa tài khoản");
-  });
-};
-users.changePassword = (userId, newPasswordHash, callback) => {
-  const sqlString = "UPDATE users SET password_hash = ? WHERE user_id = ?";
-  db.query(sqlString, [newPasswordHash, userId], (err, res) => {
-    if (err) return callback(err);
-    callback(null, "Mật khẩu đã được thay đổi");
-  });
-};
-users.updateLastLogin = (userId, callback) => {
-  const sqlString = "UPDATE users SET last_login = NOW() WHERE user_id = ?";
-  db.query(sqlString, [userId], (err, res) => {
-    if (err) return callback(err);
-    callback(null, "Cập nhật thời gian đăng nhập thành công");
-  });
-};
-
 
 users.insert = (users, callBack) => {
   const sqlString = "INSERT INTO users SET ?";
@@ -93,7 +60,7 @@ users.update = (users, id, callBack) => {
 };
 
 users.delete = (id, callBack) => {
-  db.query(`DELETE FROM users WHERE user_id = ?`, id, (err, res) => {
+  db.query(`DELETE FROM users WHERE id = ?`, id, (err, res) => {
     if (err) {
       callBack(err);
       return;
@@ -101,5 +68,20 @@ users.delete = (id, callBack) => {
     callBack("xóa users có id = " + id + " thành công");
   });
 };
+users.getByEmail = (email, callback) => {
+  const sqlString = "SELECT * FROM users WHERE email = ?";
+  db.query(sqlString, [email], (err, result) => {
+    if (err) return callback(err);
+    callback(null, result[0]); // Trả về 1 user (nếu có)
+  });
+};
+users.updateLastLogin = (id, callback) => {
+  const sqlString = "UPDATE users SET last_login = NOW() WHERE user_id = ?";
+  db.query(sqlString, [id], (err, res) => {
+    if (err) return callback(err);
+    callback(null, "Đã cập nhật last_login cho user có id = " + id);
+  });
+};
+
 
 module.exports = users;

@@ -2,7 +2,7 @@
 const db = require("../common/db");
 
 const applications = (applications) => {
-  this.application_id = applications.application_id;
+  this.application_id = applications.analytic_id;
   this.job_id = applications.job_id;
   this.user_id = applications.user_id;
   this.resume_id = applications.resume_id;
@@ -13,7 +13,7 @@ const applications = (applications) => {
 };
 
 applications.getById = (id, callback) => {
-  const sqlString = "SELECT * FROM applications WHERE id = ? ";
+  const sqlString = "SELECT * FROM applications WHERE analytic_id = ? ";
   db.query(sqlString, id, (err, result) => {
     if (err) {
       return callback(err);
@@ -44,7 +44,7 @@ applications.insert = (applications, callBack) => {
 };
 
 applications.update = (applications, id, callBack) => {
-  const sqlString = "UPDATE applications SET ? WHERE id = ?";
+  const sqlString = "UPDATE applications SET ? WHERE analytic_id = ?";
   db.query(sqlString, [applications, id], (err, res) => {
     if (err) {
       callBack(err);
@@ -55,7 +55,7 @@ applications.update = (applications, id, callBack) => {
 };
 
 applications.delete = (id, callBack) => {
-  db.query(`DELETE FROM applications WHERE id = ?`, id, (err, res) => {
+  db.query(`DELETE FROM applications WHERE analytic_id = ?`, id, (err, res) => {
     if (err) {
       callBack(err);
       return;

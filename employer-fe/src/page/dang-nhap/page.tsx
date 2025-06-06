@@ -1,5 +1,4 @@
-import { Header } from "@/components/Header"
-import { Footer } from "@/components/footer"
+
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -9,7 +8,6 @@ import { Link } from "react-router-dom"
 export default function EmployerLoginPage() {
   return (
     <div className="flex min-h-screen flex-col">
-      <Header />
       <main className="flex-1">
         <div className="container mx-auto my-12 max-w-screen-xl px-4 md:px-8">
           <div className="mx-auto grid max-w-screen-xl gap-8 lg:grid-cols-2">
@@ -146,7 +144,6 @@ export default function EmployerLoginPage() {
           </div>
         </div>
       </main>
-      <Footer />
     </div>
   )
 }

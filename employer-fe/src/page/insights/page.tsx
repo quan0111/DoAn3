@@ -1,11 +1,10 @@
-import Image from "next/image"
 import { Button } from "@/components/ui/button"
 
 export default function InsightsPage() {
   return (
     <div className="space-y-6">
       <div className="text-center py-12">
-        <Image
+        <img
           src="/images/insights-illustration.png"
           alt="TopCV Insights"
           width={400}

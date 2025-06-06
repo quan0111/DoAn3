@@ -35,7 +35,7 @@ export default function JobListPage() {
       try {
         const [jobsRes, categoriesRes] = await Promise.all([
           axios.get("http://localhost:3000/jobss"),
-          axios.get("http://localhost:3000/job_category_mappings/count/by-category"),
+          axios.get("http://localhost:3000/job_categoriess/count-jobs"),
         ]);
 
         const allJobs: Job[] = jobsRes.data;

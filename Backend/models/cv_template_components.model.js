@@ -13,7 +13,7 @@ const cv_template_components = (cv_template_components) => {
 };
 
 cv_template_components.getById = (id, callback) => {
-  const sqlString = "SELECT * FROM cv_template_components WHERE id = ? ";
+  const sqlString = "SELECT * FROM cv_template_components WHERE component_id = ? ";
   db.query(sqlString, id, (err, result) => {
     if (err) {
       return callback(err);
@@ -44,7 +44,7 @@ cv_template_components.insert = (cv_template_components, callBack) => {
 };
 
 cv_template_components.update = (cv_template_components, id, callBack) => {
-  const sqlString = "UPDATE cv_template_components SET ? WHERE id = ?";
+  const sqlString = "UPDATE cv_template_components SET ? WHERE component_id = ?";
   db.query(sqlString, [cv_template_components, id], (err, res) => {
     if (err) {
       callBack(err);
@@ -55,7 +55,7 @@ cv_template_components.update = (cv_template_components, id, callBack) => {
 };
 
 cv_template_components.delete = (id, callBack) => {
-  db.query(`DELETE FROM cv_template_components WHERE id = ?`, id, (err, res) => {
+  db.query(`DELETE FROM cv_template_components WHERE component_id = ?`, id, (err, res) => {
     if (err) {
       callBack(err);
       return;

@@ -17,7 +17,7 @@ const events = (events) => {
 };
 
 events.getById = (id, callback) => {
-  const sqlString = "SELECT * FROM events WHERE id = ? ";
+  const sqlString = "SELECT * FROM events WHERE event_id = ? ";
   db.query(sqlString, id, (err, result) => {
     if (err) {
       return callback(err);
@@ -48,23 +48,23 @@ events.insert = (events, callBack) => {
 };
 
 events.update = (events, id, callBack) => {
-  const sqlString = "UPDATE events SET ? WHERE id = ?";
+  const sqlString = "UPDATE events SET ? WHERE event_id = ?";
   db.query(sqlString, [events, id], (err, res) => {
     if (err) {
       callBack(err);
       return;
     }
-    callBack("cập nhật events có id = " + id + " thành công");
+    callBack("cập nhật events có event_id = " + id + " thành công");
   });
 };
 
 events.delete = (id, callBack) => {
-  db.query(`DELETE FROM events WHERE id = ?`, id, (err, res) => {
+  db.query(`DELETE FROM events WHERE event_id = ?`, id, (err, res) => {
     if (err) {
       callBack(err);
       return;
     }
-    callBack("xóa events có id = " + id + " thành công");
+    callBack("xóa events có event_id = " + id + " thành công");
   });
 };
 

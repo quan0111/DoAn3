@@ -1,7 +1,6 @@
 "use client"
-
-import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { Link } from "react-router-dom"
+import { useLocation } from "react-router-dom"
 import {
   BarChart3,
   Users,
@@ -44,7 +43,8 @@ const sidebarItems = [
 ]
 
 export function Sidebar() {
-  const pathname = usePathname()
+  const location = useLocation()
+  const pathname = location.pathname
 
   return (
     <aside className="w-64 bg-white shadow-sm min-h-screen">
@@ -64,7 +64,7 @@ export function Sidebar() {
           {sidebarItems.map((item) => (
             <Link
               key={item.href}
-              href={item.href}
+              to={item.href}
               className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
                 pathname === item.href
                   ? "bg-green-50 text-green-600 border-r-2 border-green-500"

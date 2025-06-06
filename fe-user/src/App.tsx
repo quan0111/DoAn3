@@ -5,7 +5,7 @@ import JobDetailPage from './page/Job/ID/page'
 import JobListPage from './page/Job/page'
 import RegisterPage from './page/dang-ky/page'
 import LoginPage from './page/dang-nhap/Page'
-import "App.css"
+import "./App.css"
 import CVTemplatesPage from './page/CV/Page'
 import CVTemplateDetailPage from './page/CV/ID/page'
 import CreateCVPage from './page/Tao-cv/page'

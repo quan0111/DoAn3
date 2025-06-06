@@ -7,17 +7,7 @@ module.exports = {
       res.send(result);
     });
   },
-  getJobsByCategoryId: (req, res) => {
-    const id = req.params.id;
-    console.log('category_id:', id);
-    jobs.getJobsByCategoryId(id, (err, result) => {
-      if (err) {
-        console.error('Error:', err);
-        return res.status(500).json({ error: err.message });
-      }
-      res.json(result);
-    });
-  },
+
   getById: (req, res) => {
     const id = req.params.id;
     jobs.getById(id, (result) => {
@@ -39,6 +29,12 @@ module.exports = {
       res.send(result);
     });
   },
+getJobsByCategory: (req, res) => {
+  const categoryId = req.params.categoryId;
+  jobs.getByCategoryId(categoryId, (result) => {
+    res.send(result);
+  });
+},
 
   delete: (req, res) => {
     const id = req.params.id;

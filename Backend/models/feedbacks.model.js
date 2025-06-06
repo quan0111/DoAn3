@@ -4,9 +4,6 @@ const db = require("../common/db");
 const feedbacks = (feedbacks) => {
   this.feedback_id = feedbacks.feedback_id;
   this.user_id = feedbacks.user_id;
-  this.full_name= feedbacks.fullname;
-  this.Desired_position = feedbacks.Desired_position;
-  this.avatar_url = feedbacks.avatar_url;
   this.subject = feedbacks.subject;
   this.message = feedbacks.message;
   this.rating = feedbacks.rating;
@@ -14,7 +11,7 @@ const feedbacks = (feedbacks) => {
 };
 
 feedbacks.getById = (id, callback) => {
-  const sqlString = "SELECT feedback_id,feedbacks.user_id,full_name,Desired_position,avatar_url,subject,message,rating,feedbacks.created_at FROM feedbacks inner join users on users.user_id = feedbacks.user_id inner join jobseekers on users.user_id = jobseekers.user_id where feedback_id=? ";
+  const sqlString = "SELECT * FROM feedbacks WHERE feedback_id = ? ";
   db.query(sqlString, id, (err, result) => {
     if (err) {
       return callback(err);
@@ -24,7 +21,7 @@ feedbacks.getById = (id, callback) => {
 };
 
 feedbacks.getAll = (callback) => {
-  const sqlString = "SELECT feedback_id,feedbacks.user_id,full_name,Desired_position,avatar_url,subject,message,rating,feedbacks.created_at FROM feedbacks inner join users on users.user_id = feedbacks.user_id inner join jobseekers on users.user_id = jobseekers.user_id";
+  const sqlString = "SELECT * FROM feedbacks ";
   db.query(sqlString, (err, result) => {
     if (err) {
       return callback(err);
@@ -45,7 +42,7 @@ feedbacks.insert = (feedbacks, callBack) => {
 };
 
 feedbacks.update = (feedbacks, id, callBack) => {
-  const sqlString = "UPDATE feedbacks SET ? WHERE id = ?";
+  const sqlString = "UPDATE feedbacks SET ? WHERE feedback_id = ?";
   db.query(sqlString, [feedbacks, id], (err, res) => {
     if (err) {
       callBack(err);
@@ -56,7 +53,7 @@ feedbacks.update = (feedbacks, id, callBack) => {
 };
 
 feedbacks.delete = (id, callBack) => {
-  db.query(`DELETE FROM feedbacks WHERE id = ?`, id, (err, res) => {
+  db.query(`DELETE FROM feedbacks WHERE feedback_id = ?`, id, (err, res) => {
     if (err) {
       callBack(err);
       return;

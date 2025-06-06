@@ -1,6 +1,6 @@
 "use client"
 
-import Link from "next/link"
+import { Link } from "react-router-dom"
 import { usePathname } from "next/navigation"
 import {
   BarChart3,
@@ -64,7 +64,7 @@ export function Sidebar() {
           {sidebarItems.map((item) => (
             <Link
               key={item.href}
-              href={item.href}
+              to={item.href}
               className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
                 pathname === item.href
                   ? "bg-green-50 text-green-600 border-r-2 border-green-500"

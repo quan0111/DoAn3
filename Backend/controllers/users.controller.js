@@ -1,27 +1,15 @@
 const users = require("../models/users.model");
-const bcrypt = require("bcrypt");
-const SALT_ROUNDS = 10;
+const upload = require("../config/multer.config");
 
 module.exports = {
+  // Lấy tất cả users
   getAll: (req, res) => {
     users.getAll((result) => {
       res.send(result);
     });
   },
 
-  getByEmail: (req, res) => {
-    const email = req.body.email;
-    users.getByEmail(email, (err, user) => {
-      if (err) {
-        return res.status(500).json({ message: "Lỗi server" });
-      }
-      if (!user) {
-        return res.status(404).json({ message: "Không tìm thấy user" });
-      }
-      res.json(user);
-    });
-  },
-
+  // Lấy user theo ID
   getById: (req, res) => {
     const id = req.params.id;
     users.getById(id, (result) => {
@@ -29,85 +17,91 @@ module.exports = {
     });
   },
 
-  insert: async (req, res) => {
-    try {
-      const user = req.body;
-
-      if (user.password_hash) {
-        const hashedPassword = await bcrypt.hash(user.password_hash, SALT_ROUNDS);
-        user.password_hash = hashedPassword;
-        delete user.password;
+  // Thêm user mới (hỗ trợ upload ảnh)
+  insert: [
+    upload.single("avatar"), // Xử lý file avatar
+    (req, res) => {
+      const userData = req.body;
+      // Nếu có file ảnh, thêm avatar_url vào userData
+      if (req.file) {
+        userData.avatar_url = `/uploads/${req.file.filename}`;
       }
-
-      users.insert(user, (result) => {
+      users.insert(userData, (err, result) => {
+        if (err) return res.status(500).send({ error: err.message });
         res.send(result);
       });
-    } catch (error) {
-      res.status(500).json({ message: "Lỗi khi tạo user", error });
-    }
-  },
+    },
+  ],
 
-  update: async (req, res) => {
-    try {
-      const user = req.body;
+  // Cập nhật user (hỗ trợ upload ảnh)
+  update: [
+    upload.single("avatar"), // Xử lý file avatar
+    (req, res) => {
+      const userData = req.body;
       const id = req.params.id;
-
-      if (user.password_hash) {
-        const hashedPassword = await bcrypt.hash(user.password_hash, SALT_ROUNDS);
-        user.password_hash = hashedPassword;
-        delete user.password;
+      // Nếu có file ảnh, cập nhật avatar_url
+      if (req.file) {
+        userData.avatar_url = `/uploads/${req.file.filename}`;
+        // Xóa ảnh cũ nếu có (giả sử model trả về user cũ)
+        users.getById(id, (oldUser) => {
+          if (oldUser && oldUser.avatar_url) {
+            const oldPath = path.join(__dirname, "..", oldUser.avatar_url);
+            if (fs.existsSync(oldPath)) {
+              fs.unlinkSync(oldPath);
+            }
+          }
+        });
       }
-
-      users.update(user, id, (result) => {
+      users.update(userData, id, (err, result) => {
+        if (err) return res.status(500).send({ error: err.message });
         res.send(result);
       });
-    } catch (error) {
-      res.status(500).json({ message: "Lỗi khi cập nhật user", error });
-    }
-  },
+    },
+  ],
 
-  delete: (req, res) => {
-    const id = req.params.id;
-    users.delete(id, (result) => {
+  // Lấy user theo email
+  getByEmail: (req, res) => {
+    const email = req.params.email;
+    users.getByEmail(email, (err, result) => {
+      if (err) return res.status(500).send({ error: err.message });
       res.send(result);
     });
   },
 
-  // ✅ Cập nhật thời gian đăng nhập
+  // Cập nhật last_login theo ID
   updateLastLogin: (req, res) => {
     const id = req.params.id;
     users.updateLastLogin(id, (err, result) => {
-      if (err) return res.status(500).json({ message: "Lỗi khi cập nhật đăng nhập", error: err });
-      res.json({ message: result });
+      if (err) return res.status(500).send({ error: err.message });
+      res.send(result);
     });
   },
 
-  // ✅ Vô hiệu hóa tài khoản
-  deactivateUser: (req, res) => {
+  // Cập nhật trạng thái is_active
+  updateActiveStatus: (req, res) => {
     const id = req.params.id;
-    users.deactivateUser(id, (err, result) => {
-      if (err) return res.status(500).json({ message: "Lỗi khi vô hiệu hóa", error: err });
-      res.json({ message: result });
+    const { is_active } = req.body;
+    users.updateActiveStatus(id, is_active, (err, result) => {
+      if (err) return res.status(500).send({ error: err.message });
+      res.send(result);
     });
   },
 
-  // ✅ Đổi mật khẩu
-  changePassword: async (req, res) => {
+  // Xóa user
+  delete: (req, res) => {
     const id = req.params.id;
-    const { newPassword } = req.body;
-
-    if (!newPassword) {
-      return res.status(400).json({ message: "Mật khẩu mới không được để trống" });
-    }
-
-    try {
-      const hashedPassword = await bcrypt.hash(newPassword, SALT_ROUNDS);
-      users.changePassword(id, hashedPassword, (err, result) => {
-        if (err) return res.status(500).json({ message: "Lỗi khi đổi mật khẩu", error: err });
-        res.json({ message: result });
-      });
-    } catch (error) {
-      res.status(500).json({ message: "Lỗi server", error });
-    }
+    // Xóa ảnh nếu có
+    users.getById(id, (user) => {
+      if (user && user.avatar_url) {
+        const avatarPath = path.join(__dirname, "..", user.avatar_url);
+        if (fs.existsSync(avatarPath)) {
+          fs.unlinkSync(avatarPath);
+        }
+      }
+    });
+    users.delete(id, (err, result) => {
+      if (err) return res.status(500).send({ error: err.message });
+      res.send(result);
+    });
   },
 };

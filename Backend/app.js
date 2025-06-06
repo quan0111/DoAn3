@@ -7,18 +7,11 @@ var logger = require('morgan');
 var cors = require('cors');
 const port = 3000; // Đây là cổng bạn cần biết
 
-
 // Require các router
-var authRouter = require('./routes/auth.route');
 var indexRouter = require('./routes/index');
-var advertisementsRouter = require('./routes/advertisements.route');
 var analyticsRouter = require('./routes/analytics.route');
 var applicationsRouter = require('./routes/applications.route');
-var article_categoriesRouter = require('./routes/article_categories.route');
-var article_category_mappingRouter = require('./routes/article_category_mapping.route');
-var articlesRouter = require('./routes/articles.route');
 var companiesRouter = require('./routes/companies.route');
-var company_followersRouter = require('./routes/company_followers.route');
 var cv_template_categoriesRouter = require('./routes/cv_template_categories.route');
 var cv_template_componentsRouter = require('./routes/cv_template_components.route');
 var cv_template_industriesRouter = require('./routes/cv_template_industries.route');
@@ -34,15 +27,17 @@ var job_skillsRouter = require('./routes/job_skills.route');
 var jobsRouter = require('./routes/jobs.route');
 var jobseekersRouter = require('./routes/jobseekers.route');
 var notificationsRouter = require('./routes/notifications.route');
-var paymentsRouter = require('./routes/payments.route');
+var payment_servicesRouter = require('./routes/payment_services.route');
 var resumesRouter = require('./routes/resumes.route');
 var saved_jobsRouter = require('./routes/saved_jobs.route');
+var service_categoriesRouter = require('./routes/service_categories.route');
 var user_activitiesRouter = require('./routes/user_activities.route');
 var user_cv_templatesRouter = require('./routes/user_cv_templates.route');
+var user_paymentsRouter = require('./routes/user_payments.route');
 var usersRouter = require('./routes/users.route');
 
 var app = express();
-app.use(cors());
+
 // View engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -52,18 +47,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
+app.use(cors());
 // Đăng ký các router
-app.use('/auth',authRouter)
 app.use('/', indexRouter);
-app.use('/advertisementss', advertisementsRouter);
 app.use('/analyticss', analyticsRouter);
 app.use('/applicationss', applicationsRouter);
-app.use('/article_categoriess', article_categoriesRouter);
-app.use('/article_category_mappings', article_category_mappingRouter);
-app.use('/articless', articlesRouter);
 app.use('/companiess', companiesRouter);
-app.use('/company_followerss', company_followersRouter);
 app.use('/cv_template_categoriess', cv_template_categoriesRouter);
 app.use('/cv_template_componentss', cv_template_componentsRouter);
 app.use('/cv_template_industriess', cv_template_industriesRouter);
@@ -79,11 +68,13 @@ app.use('/job_skillss', job_skillsRouter);
 app.use('/jobss', jobsRouter);
 app.use('/jobseekerss', jobseekersRouter);
 app.use('/notificationss', notificationsRouter);
-app.use('/paymentss', paymentsRouter);
+app.use('/payment_servicess', payment_servicesRouter);
 app.use('/resumess', resumesRouter);
 app.use('/saved_jobss', saved_jobsRouter);
+app.use('/service_categoriess', service_categoriesRouter);
 app.use('/user_activitiess', user_activitiesRouter);
 app.use('/user_cv_templatess', user_cv_templatesRouter);
+app.use('/user_paymentss', user_paymentsRouter);
 app.use('/userss', usersRouter);
 
 // Catch 404 and forward to error handler
@@ -102,8 +93,7 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 app.listen(port, () => {
-  console.log(`Back-end đang chạy trên cổng: ${port}`);
+  console.log(`🚀 Server is running at http://localhost:${port}`);
 });
-
 
 module.exports = app;

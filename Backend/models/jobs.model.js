@@ -4,8 +4,6 @@ const db = require("../common/db");
 const jobs = (jobs) => {
   this.job_id = jobs.job_id;
   this.company_id = jobs.company_id;
-  this.company_name = jobs.company_name;
-  this.logo_url = jobs.logo_url;
   this.title = jobs.title;
   this.description = jobs.description;
   this.requirements = jobs.requirements;
@@ -23,11 +21,11 @@ const jobs = (jobs) => {
   this.application_count = jobs.application_count;
   this.created_at = jobs.created_at;
   this.updated_at = jobs.updated_at;
-  this.education_level = jobs.education_level
+  this.education_level = jobs.education_level;
 };
 
 jobs.getById = (id, callback) => {
-  const sqlString = "SELECT job_id,jobs.company_id,company_name,logo_url,title,jobs.description,education_level,requirements,benefits,salary_min,salary_max,jobs.location,job_level,job_type,status,priority_score,auto_expire,view_count,application_count,jobs.created_at,jobs.updated_at FROM jobs inner join companies on jobs.company_id = companies.company_id WHERE job_id = ?";
+  const sqlString = "SELECT * FROM jobs WHERE job_id = ? ";
   db.query(sqlString, id, (err, result) => {
     if (err) {
       return callback(err);
@@ -35,16 +33,9 @@ jobs.getById = (id, callback) => {
     callback(result);
   });
 };
-  jobs.getJobsByCategoryId = (categoryId, callback) => {
-    const sqlString = " SELECT j.* FROM jobs j JOIN job_category_mapping m ON j.job_id = m.job_id WHERE m.category_id = ? ";
-    db.query(sqlString, [categoryId], (err, result) => {
-      if (err) return callback(err, null);
-      callback(null, result);
-    });
-  };
 
 jobs.getAll = (callback) => {
-  const sqlString = "SELECT job_id,jobs.company_id,company_name,logo_url,title,jobs.description,requirements,benefits,salary_min,salary_max,jobs.location,job_level,job_type,status,priority_score,auto_expire,view_count,application_count,jobs.created_at,jobs.updated_at FROM jobs inner join companies on jobs.company_id = companies.company_id";
+  const sqlString = "SELECT * FROM jobs ";
   db.query(sqlString, (err, result) => {
     if (err) {
       return callback(err);
@@ -65,7 +56,7 @@ jobs.insert = (jobs, callBack) => {
 };
 
 jobs.update = (jobs, id, callBack) => {
-  const sqlString = "UPDATE jobs SET ? WHERE id = ?";
+  const sqlString = "UPDATE jobs SET ? WHERE job_id = ?";
   db.query(sqlString, [jobs, id], (err, res) => {
     if (err) {
       callBack(err);
@@ -74,9 +65,21 @@ jobs.update = (jobs, id, callBack) => {
     callBack("cập nhật jobs có id = " + id + " thành công");
   });
 };
+jobs.getByCategoryId = (category_id, callback) => {
+  const sqlString = `
+    SELECT j.* FROM jobs j
+    INNER JOIN job_category_mapping m ON j.job_id = m.job_id
+    WHERE m.category_id = ?
+  `;
+  db.query(sqlString, [category_id], (err, result) => {
+    if (err) return callback(err);
+    callback(result);
+  });
+};
+
 
 jobs.delete = (id, callBack) => {
-  db.query(`DELETE FROM jobs WHERE id = ?`, id, (err, res) => {
+  db.query(`DELETE FROM jobs WHERE job_id = ?`, id, (err, res) => {
     if (err) {
       callBack(err);
       return;

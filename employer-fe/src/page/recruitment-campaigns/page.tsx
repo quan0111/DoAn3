@@ -1,4 +1,3 @@
-import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -8,7 +7,7 @@ export default function RecruitmentCampaignsPage() {
     <div className="space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div>
-          <Image
+          <img
             src="/images/recruitment-campaign.png"
             alt="Recruitment Campaign"
             width={500}

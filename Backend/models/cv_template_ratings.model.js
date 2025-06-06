@@ -10,7 +10,7 @@ const cv_template_ratings = (cv_template_ratings) => {
 };
 
 cv_template_ratings.getById = (id, callback) => {
-  const sqlString = "SELECT * FROM cv_template_ratings WHERE id = ? ";
+  const sqlString = "SELECT * FROM cv_template_ratings WHERE rating_id = ? ";
   db.query(sqlString, id, (err, result) => {
     if (err) {
       return callback(err);
@@ -41,7 +41,7 @@ cv_template_ratings.insert = (cv_template_ratings, callBack) => {
 };
 
 cv_template_ratings.update = (cv_template_ratings, id, callBack) => {
-  const sqlString = "UPDATE cv_template_ratings SET ? WHERE id = ?";
+  const sqlString = "UPDATE cv_template_ratings SET ? WHERE rating_id = ?";
   db.query(sqlString, [cv_template_ratings, id], (err, res) => {
     if (err) {
       callBack(err);
@@ -52,7 +52,7 @@ cv_template_ratings.update = (cv_template_ratings, id, callBack) => {
 };
 
 cv_template_ratings.delete = (id, callBack) => {
-  db.query(`DELETE FROM cv_template_ratings WHERE id = ?`, id, (err, res) => {
+  db.query(`DELETE FROM cv_template_ratings WHERE rating_id = ?`, id, (err, res) => {
     if (err) {
       callBack(err);
       return;

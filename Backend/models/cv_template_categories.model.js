@@ -9,7 +9,7 @@ const cv_template_categories = (cv_template_categories) => {
 };
 
 cv_template_categories.getById = (id, callback) => {
-  const sqlString = "SELECT * FROM cv_template_categories WHERE id = ? ";
+  const sqlString = "SELECT * FROM cv_template_categories WHERE category_id = ? ";
   db.query(sqlString, id, (err, result) => {
     if (err) {
       return callback(err);
@@ -40,18 +40,18 @@ cv_template_categories.insert = (cv_template_categories, callBack) => {
 };
 
 cv_template_categories.update = (cv_template_categories, id, callBack) => {
-  const sqlString = "UPDATE cv_template_categories SET ? WHERE id = ?";
+  const sqlString = "UPDATE cv_template_categories SET ? WHERE category_id = ?";
   db.query(sqlString, [cv_template_categories, id], (err, res) => {
     if (err) {
       callBack(err);
       return;
     }
-    callBack("cập nhật cv_template_categories có id = " + id + " thành công");
+    callBack("cập nhật cv_template_categories có category_id = " + id + " thành công");
   });
 };
 
 cv_template_categories.delete = (id, callBack) => {
-  db.query(`DELETE FROM cv_template_categories WHERE id = ?`, id, (err, res) => {
+  db.query(`DELETE FROM cv_template_categories WHERE category_id = ?`, id, (err, res) => {
     if (err) {
       callBack(err);
       return;

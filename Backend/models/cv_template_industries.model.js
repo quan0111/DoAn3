@@ -7,7 +7,7 @@ const cv_template_industries = (cv_template_industries) => {
 };
 
 cv_template_industries.getById = (id, callback) => {
-  const sqlString = "SELECT * FROM cv_template_industries WHERE id = ? ";
+  const sqlString = "SELECT * FROM cv_template_industries WHERE template_id = ? ";
   db.query(sqlString, id, (err, result) => {
     if (err) {
       return callback(err);
@@ -44,17 +44,17 @@ cv_template_industries.update = (cv_template_industries, id, callBack) => {
       callBack(err);
       return;
     }
-    callBack("cập nhật cv_template_industries có id = " + id + " thành công");
+    callBack("cập nhật cv_template_industries có template_id = " + id + " thành công");
   });
 };
 
 cv_template_industries.delete = (id, callBack) => {
-  db.query(`DELETE FROM cv_template_industries WHERE id = ?`, id, (err, res) => {
+  db.query(`DELETE FROM cv_template_industries WHERE template_id = ?`, id, (err, res) => {
     if (err) {
       callBack(err);
       return;
     }
-    callBack("xóa cv_template_industries có id = " + id + " thành công");
+    callBack("xóa cv_template_industries có template_id = " + id + " thành công");
   });
 };
 

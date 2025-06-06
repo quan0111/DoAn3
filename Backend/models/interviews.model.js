@@ -14,7 +14,7 @@ const interviews = (interviews) => {
 };
 
 interviews.getById = (id, callback) => {
-  const sqlString = "SELECT * FROM interviews WHERE id = ? ";
+  const sqlString = "SELECT * FROM interviews WHERE interview_id = ? ";
   db.query(sqlString, id, (err, result) => {
     if (err) {
       return callback(err);
@@ -45,18 +45,18 @@ interviews.insert = (interviews, callBack) => {
 };
 
 interviews.update = (interviews, id, callBack) => {
-  const sqlString = "UPDATE interviews SET ? WHERE id = ?";
+  const sqlString = "UPDATE interviews SET ? WHERE interview_id = ?";
   db.query(sqlString, [interviews, id], (err, res) => {
     if (err) {
       callBack(err);
       return;
     }
-    callBack("cập nhật interviews có id = " + id + " thành công");
+    callBack("cập nhật interviews có interview_id = " + id + " thành công");
   });
 };
 
 interviews.delete = (id, callBack) => {
-  db.query(`DELETE FROM interviews WHERE id = ?`, id, (err, res) => {
+  db.query(`DELETE FROM interviews WHERE interview_id = ?`, id, (err, res) => {
     if (err) {
       callBack(err);
       return;

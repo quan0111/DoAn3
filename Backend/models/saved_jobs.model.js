@@ -8,7 +8,7 @@ const saved_jobs = (saved_jobs) => {
 };
 
 saved_jobs.getById = (id, callback) => {
-  const sqlString = "SELECT * FROM saved_jobs WHERE id = ? ";
+  const sqlString = "SELECT * FROM saved_jobs WHERE user_id = ? ";
   db.query(sqlString, id, (err, result) => {
     if (err) {
       return callback(err);
@@ -39,7 +39,7 @@ saved_jobs.insert = (saved_jobs, callBack) => {
 };
 
 saved_jobs.update = (saved_jobs, id, callBack) => {
-  const sqlString = "UPDATE saved_jobs SET ? WHERE id = ?";
+  const sqlString = "UPDATE saved_jobs SET ? WHERE user_id = ?";
   db.query(sqlString, [saved_jobs, id], (err, res) => {
     if (err) {
       callBack(err);
@@ -50,7 +50,7 @@ saved_jobs.update = (saved_jobs, id, callBack) => {
 };
 
 saved_jobs.delete = (id, callBack) => {
-  db.query(`DELETE FROM saved_jobs WHERE id = ?`, id, (err, res) => {
+  db.query(`DELETE FROM saved_jobs WHERE user_id = ?`, id, (err, res) => {
     if (err) {
       callBack(err);
       return;

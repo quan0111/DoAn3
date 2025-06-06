@@ -1,4 +1,3 @@
-import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
@@ -59,7 +58,7 @@ export default function ReportsPage() {
         </div>
 
         <div className="flex items-center justify-center">
-          <Image
+          <img
             src="/images/reports-dashboard.png"
             alt="Reports Dashboard"
             width={500}

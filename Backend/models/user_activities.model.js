@@ -10,7 +10,7 @@ const user_activities = (user_activities) => {
 };
 
 user_activities.getById = (id, callback) => {
-  const sqlString = "SELECT * FROM user_activities WHERE id = ? ";
+  const sqlString = "SELECT * FROM user_activities WHERE activity_id = ? ";
   db.query(sqlString, id, (err, result) => {
     if (err) {
       return callback(err);
@@ -41,7 +41,7 @@ user_activities.insert = (user_activities, callBack) => {
 };
 
 user_activities.update = (user_activities, id, callBack) => {
-  const sqlString = "UPDATE user_activities SET ? WHERE id = ?";
+  const sqlString = "UPDATE user_activities SET ? WHERE activity_id = ?";
   db.query(sqlString, [user_activities, id], (err, res) => {
     if (err) {
       callBack(err);
@@ -52,7 +52,7 @@ user_activities.update = (user_activities, id, callBack) => {
 };
 
 user_activities.delete = (id, callBack) => {
-  db.query(`DELETE FROM user_activities WHERE id = ?`, id, (err, res) => {
+  db.query(`DELETE FROM user_activities WHERE activity_id = ?`, id, (err, res) => {
     if (err) {
       callBack(err);
       return;

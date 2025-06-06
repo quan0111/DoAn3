@@ -4,7 +4,7 @@ const db = require("../common/db");
 const jobseekers = (jobseekers) => {
   this.user_id = jobseekers.user_id;
   this.career_goals = jobseekers.career_goals;
-  this.Desired_position= jobseekers.Desired_position
+  this.desired_position = jobseekers.desired_position;
   this.experience_years = jobseekers.experience_years;
   this.desired_salary_min = jobseekers.desired_salary_min;
   this.desired_salary_max = jobseekers.desired_salary_max;
@@ -16,7 +16,7 @@ const jobseekers = (jobseekers) => {
 };
 
 jobseekers.getById = (id, callback) => {
-  const sqlString = "SELECT * FROM jobseekers WHERE id = ? ";
+  const sqlString = "SELECT * FROM jobseekers WHERE user_id = ? ";
   db.query(sqlString, id, (err, result) => {
     if (err) {
       return callback(err);
@@ -47,7 +47,7 @@ jobseekers.insert = (jobseekers, callBack) => {
 };
 
 jobseekers.update = (jobseekers, id, callBack) => {
-  const sqlString = "UPDATE jobseekers SET ? WHERE id = ?";
+  const sqlString = "UPDATE jobseekers SET ? WHERE user_id = ?";
   db.query(sqlString, [jobseekers, id], (err, res) => {
     if (err) {
       callBack(err);
@@ -58,12 +58,12 @@ jobseekers.update = (jobseekers, id, callBack) => {
 };
 
 jobseekers.delete = (id, callBack) => {
-  db.query(`DELETE FROM jobseekers WHERE id = ?`, id, (err, res) => {
+  db.query(`DELETE FROM jobseekers WHERE user_id = ?`, id, (err, res) => {
     if (err) {
       callBack(err);
       return;
     }
-    callBack("xóa jobseekers có id = " + id + " thành công");
+    callBack("xóa jobseekers có user_id = " + id + " thành công");
   });
 };
 

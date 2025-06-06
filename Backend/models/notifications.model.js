@@ -2,7 +2,7 @@
 const db = require("../common/db");
 
 const notifications = (notifications) => {
-  this.notification_id = notifications.notification_id;
+  this.notification_id = notifications.user_id;
   this.user_id = notifications.user_id;
   this.type = notifications.type;
   this.message = notifications.message;
@@ -11,7 +11,7 @@ const notifications = (notifications) => {
 };
 
 notifications.getById = (id, callback) => {
-  const sqlString = "SELECT * FROM notifications WHERE id = ? ";
+  const sqlString = "SELECT * FROM notifications WHERE user_id = ? ";
   db.query(sqlString, id, (err, result) => {
     if (err) {
       return callback(err);
@@ -42,23 +42,23 @@ notifications.insert = (notifications, callBack) => {
 };
 
 notifications.update = (notifications, id, callBack) => {
-  const sqlString = "UPDATE notifications SET ? WHERE id = ?";
+  const sqlString = "UPDATE notifications SET ? WHERE user_id = ?";
   db.query(sqlString, [notifications, id], (err, res) => {
     if (err) {
       callBack(err);
       return;
     }
-    callBack("cập nhật notifications có id = " + id + " thành công");
+    callBack("cập nhật notifications có user_id = " + id + " thành công");
   });
 };
 
 notifications.delete = (id, callBack) => {
-  db.query(`DELETE FROM notifications WHERE id = ?`, id, (err, res) => {
+  db.query(`DELETE FROM notifications WHERE user_id = ?`, id, (err, res) => {
     if (err) {
       callBack(err);
       return;
     }
-    callBack("xóa notifications có id = " + id + " thành công");
+    callBack("xóa notifications có user_id = " + id + " thành công");
   });
 };
 

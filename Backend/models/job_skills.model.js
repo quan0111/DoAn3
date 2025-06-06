@@ -7,7 +7,7 @@ const job_skills = (job_skills) => {
 };
 
 job_skills.getById = (id, callback) => {
-  const sqlString = "SELECT * FROM job_skills WHERE id = ? ";
+  const sqlString = "SELECT * FROM job_skills WHERE job_id = ? ";
   db.query(sqlString, id, (err, result) => {
     if (err) {
       return callback(err);
@@ -38,7 +38,7 @@ job_skills.insert = (job_skills, callBack) => {
 };
 
 job_skills.update = (job_skills, id, callBack) => {
-  const sqlString = "UPDATE job_skills SET ? WHERE id = ?";
+  const sqlString = "UPDATE job_skills SET ? WHERE job_id = ?";
   db.query(sqlString, [job_skills, id], (err, res) => {
     if (err) {
       callBack(err);
@@ -49,7 +49,7 @@ job_skills.update = (job_skills, id, callBack) => {
 };
 
 job_skills.delete = (id, callBack) => {
-  db.query(`DELETE FROM job_skills WHERE id = ?`, id, (err, res) => {
+  db.query(`DELETE FROM job_skills WHERE job_id = ?`, id, (err, res) => {
     if (err) {
       callBack(err);
       return;

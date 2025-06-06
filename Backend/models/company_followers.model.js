@@ -8,7 +8,7 @@ const company_followers = (company_followers) => {
 };
 
 company_followers.getById = (id, callback) => {
-  const sqlString = "SELECT * FROM company_followers WHERE id = ? ";
+  const sqlString = "SELECT * FROM company_followers WHERE user_id = ? ";
   db.query(sqlString, id, (err, result) => {
     if (err) {
       return callback(err);
@@ -39,7 +39,7 @@ company_followers.insert = (company_followers, callBack) => {
 };
 
 company_followers.update = (company_followers, id, callBack) => {
-  const sqlString = "UPDATE company_followers SET ? WHERE id = ?";
+  const sqlString = "UPDATE company_followers SET ? WHERE user_id = ?";
   db.query(sqlString, [company_followers, id], (err, res) => {
     if (err) {
       callBack(err);
@@ -50,7 +50,7 @@ company_followers.update = (company_followers, id, callBack) => {
 };
 
 company_followers.delete = (id, callBack) => {
-  db.query(`DELETE FROM company_followers WHERE id = ?`, id, (err, res) => {
+  db.query(`DELETE FROM company_followers WHERE user_id = ?`, id, (err, res) => {
     if (err) {
       callBack(err);
       return;

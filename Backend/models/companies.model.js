@@ -10,14 +10,14 @@ const companies = (companies) => {
   this.website = companies.website;
   this.location = companies.location;
   this.company_size = companies.company_size;
-  this.industry = companies.industry;
   this.verified = companies.verified;
   this.created_at = companies.created_at;
   this.updated_at = companies.updated_at;
+  this.industry = companies.industry;
 };
 
 companies.getById = (id, callback) => {
-  const sqlString = "SELECT * FROM companies WHERE id = ? ";
+  const sqlString = "SELECT * FROM companies WHERE company_id = ? ";
   db.query(sqlString, id, (err, result) => {
     if (err) {
       return callback(err);
@@ -48,7 +48,7 @@ companies.insert = (companies, callBack) => {
 };
 
 companies.update = (companies, id, callBack) => {
-  const sqlString = "UPDATE companies SET ? WHERE id = ?";
+  const sqlString = "UPDATE companies SET ? WHERE company_id = ?";
   db.query(sqlString, [companies, id], (err, res) => {
     if (err) {
       callBack(err);
@@ -59,7 +59,7 @@ companies.update = (companies, id, callBack) => {
 };
 
 companies.delete = (id, callBack) => {
-  db.query(`DELETE FROM companies WHERE id = ?`, id, (err, res) => {
+  db.query(`DELETE FROM companies WHERE company_id = ?`, id, (err, res) => {
     if (err) {
       callBack(err);
       return;

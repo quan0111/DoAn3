@@ -1,42 +1,38 @@
-const job_category_mappingModel = require("../models/job_category_mapping.model");
+
+const job_category_mapping = require("../models/job_category_mapping.model");
 
 module.exports = {
   getAll: (req, res) => {
-    job_category_mappingModel.getAll((err, result) => {
-      if (err) return res.status(500).send(err);
+    job_category_mapping.getAll((result) => {
       res.send(result);
     });
   },
 
-  countJobsByCategory: (req, res) => {
-    job_category_mappingModel.countJobsByCategory((err, result) => {
-      if (err) return res.status(500).send(err);
+  getById: (req, res) => {
+    const id = req.params.id;
+    job_category_mapping.getById(id, (result) => {
       res.send(result);
     });
   },
-
 
   insert: (req, res) => {
-    const data = req.body;
-    job_category_mappingModel.insert(data, (err, result) => {
-      if (err) return res.status(500).send(err);
+    const job_category_mapping = req.body;
+    job_category_mapping.insert(job_category_mapping, (result) => {
       res.send(result);
     });
   },
 
   update: (req, res) => {
-    const data = req.body;
+    const job_category_mapping = req.body;
     const id = req.params.id;
-    job_category_mappingModel.update(data, id, (err, result) => {
-      if (err) return res.status(500).send(err);
+    job_category_mapping.update(job_category_mapping, id, (result) => {
       res.send(result);
     });
   },
 
   delete: (req, res) => {
     const id = req.params.id;
-    job_category_mappingModel.delete(id, (err, result) => {
-      if (err) return res.status(500).send(err);
+    job_category_mapping.delete(id, (result) => {
       res.send(result);
     });
   },

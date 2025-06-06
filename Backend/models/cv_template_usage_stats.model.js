@@ -10,7 +10,7 @@ const cv_template_usage_stats = (cv_template_usage_stats) => {
 };
 
 cv_template_usage_stats.getById = (id, callback) => {
-  const sqlString = "SELECT * FROM cv_template_usage_stats WHERE id = ? ";
+  const sqlString = "SELECT * FROM cv_template_usage_stats WHERE stat_id = ? ";
   db.query(sqlString, id, (err, result) => {
     if (err) {
       return callback(err);
@@ -41,7 +41,7 @@ cv_template_usage_stats.insert = (cv_template_usage_stats, callBack) => {
 };
 
 cv_template_usage_stats.update = (cv_template_usage_stats, id, callBack) => {
-  const sqlString = "UPDATE cv_template_usage_stats SET ? WHERE id = ?";
+  const sqlString = "UPDATE cv_template_usage_stats SET ? WHERE stat_id = ?";
   db.query(sqlString, [cv_template_usage_stats, id], (err, res) => {
     if (err) {
       callBack(err);
@@ -52,7 +52,7 @@ cv_template_usage_stats.update = (cv_template_usage_stats, id, callBack) => {
 };
 
 cv_template_usage_stats.delete = (id, callBack) => {
-  db.query(`DELETE FROM cv_template_usage_stats WHERE id = ?`, id, (err, res) => {
+  db.query(`DELETE FROM cv_template_usage_stats WHERE stat_id = ?`, id, (err, res) => {
     if (err) {
       callBack(err);
       return;

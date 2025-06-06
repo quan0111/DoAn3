@@ -8,11 +8,9 @@ router.get('/:id', userscontroller.getById);
 router.post('/', userscontroller.insert);
 router.put('/:id', userscontroller.update);
 router.delete('/:id', userscontroller.delete);
-// ✅ Cập nhật thời gian đăng nhập cuối cùng
+router.get("/email/:email", userscontroller.getByEmail);
+router.patch("/last-login/:id", userscontroller.updateLastLogin);
+router.patch("/active-status/:id", userscontroller.updateActiveStatus);
 
-// ✅ Vô hiệu hóa user (deactivate)
-router.patch('/:id/deactivate', userscontroller.deactivateUser);
 
-// ✅ Đổi mật khẩu
-router.patch('/:id/update-password', userscontroller.changePassword);
 module.exports = router;

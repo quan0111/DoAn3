@@ -15,7 +15,7 @@ const cv_templates = (cv_templates) => {
 };
 
 cv_templates.getById = (id, callback) => {
-  const sqlString = "SELECT * FROM cv_templates WHERE id = ? ";
+  const sqlString = "SELECT * FROM cv_templates WHERE template_id = ? ";
   db.query(sqlString, id, (err, result) => {
     if (err) {
       return callback(err);
@@ -46,7 +46,7 @@ cv_templates.insert = (cv_templates, callBack) => {
 };
 
 cv_templates.update = (cv_templates, id, callBack) => {
-  const sqlString = "UPDATE cv_templates SET ? WHERE id = ?";
+  const sqlString = "UPDATE cv_templates SET ? WHERE template_id = ?";
   db.query(sqlString, [cv_templates, id], (err, res) => {
     if (err) {
       callBack(err);
@@ -57,7 +57,7 @@ cv_templates.update = (cv_templates, id, callBack) => {
 };
 
 cv_templates.delete = (id, callBack) => {
-  db.query(`DELETE FROM cv_templates WHERE id = ?`, id, (err, res) => {
+  db.query(`DELETE FROM cv_templates WHERE template_id = ?`, id, (err, res) => {
     if (err) {
       callBack(err);
       return;
