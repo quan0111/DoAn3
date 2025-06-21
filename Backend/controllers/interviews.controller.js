@@ -14,18 +14,26 @@ module.exports = {
       res.send(result);
     });
   },
-
+  
   insert: (req, res) => {
-    const interviews = req.body;
-    interviews.insert(interviews, (result) => {
+    const newinterviews = req.body;
+    interviews.insert(newinterviews, (result) => {
       res.send(result);
     });
   },
+  checkExistByApplicationId: (req, res) => {
+  const application_id = req.params.application_id;
+  interviews.existsByApplicationId(application_id, (err, exists) => {
+    if (err) return res.status(500).send("Lỗi kiểm tra tồn tại");
+    res.send({ exists });
+  });
+},
+
 
   update: (req, res) => {
-    const interviews = req.body;
+    const udinterviews = req.body;
     const id = req.params.id;
-    interviews.update(interviews, id, (result) => {
+    interviews.update(udinterviews, id, (result) => {
       res.send(result);
     });
   },

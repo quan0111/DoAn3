@@ -9,7 +9,8 @@ const port = 3000; // Đây là cổng bạn cần biết
 
 // Require các router
 var indexRouter = require('./routes/index');
-var analyticsRouter = require('./routes/analytics.route');
+var authRouter = require('./routes/auth.route')
+ var analyticsRouter = require('./routes/analytics.route');
 var applicationsRouter = require('./routes/applications.route');
 var companiesRouter = require('./routes/companies.route');
 var cv_template_categoriesRouter = require('./routes/cv_template_categories.route');
@@ -49,7 +50,9 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors());
 // Đăng ký các router
+
 app.use('/', indexRouter);
+app.use('/auth',authRouter);
 app.use('/analyticss', analyticsRouter);
 app.use('/applicationss', applicationsRouter);
 app.use('/companiess', companiesRouter);

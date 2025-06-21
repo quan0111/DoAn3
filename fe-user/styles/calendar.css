@@ -1,0 +1,42 @@
+
+/* src/styles/calendar.css */
+.calendar-container {
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background: white;
+}
+
+.command-container {
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.command-item:hover {
+  background-color: #dcfce7; /* Tailwind green-100 */
+}
+
+.command-item[data-selected="true"] {
+  background-color: #16a34a; /* Tailwind green-600 */
+  color: white;
+}
+
+.calendar-day {
+  border-radius: 0.375rem;
+  padding: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.calendar-day:hover {
+  background-color: #dcfce7; /* green-100 */
+}
+
+.calendar-day[data-selected="true"] {
+  background-color: #16a34a; /* green-600 */
+  color: white;
+}
+
+.calendar-day[data-disabled="true"] {
+  color: #9ca3af; /* gray-400 */
+  cursor: not-allowed;
+}

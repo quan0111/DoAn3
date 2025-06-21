@@ -11,7 +11,20 @@ const feedbacks = (feedbacks) => {
 };
 
 feedbacks.getById = (id, callback) => {
-  const sqlString = "SELECT * FROM feedbacks WHERE feedback_id = ? ";
+  const sqlString = `SELECT 
+  f.feedback_id,
+  f.subject,
+  f.message,
+  f.rating,
+  f.created_at,
+  u.full_name AS user_name,
+  u.email
+FROM feedbacks f
+LEFT JOIN users u ON f.user_id = u.user_id
+ORDER BY f.created_at DESC
+where feedback_id =? 
+;`
+;
   db.query(sqlString, id, (err, result) => {
     if (err) {
       return callback(err);
@@ -21,7 +34,18 @@ feedbacks.getById = (id, callback) => {
 };
 
 feedbacks.getAll = (callback) => {
-  const sqlString = "SELECT * FROM feedbacks ";
+  const sqlString = `SELECT 
+  f.feedback_id,
+  f.subject,
+  f.message,
+  f.rating,
+  f.created_at,
+  u.full_name AS user_name,
+  u.email
+FROM feedbacks f
+LEFT JOIN users u ON f.user_id = u.user_id
+ORDER BY f.created_at DESC;`
+;
   db.query(sqlString, (err, result) => {
     if (err) {
       return callback(err);

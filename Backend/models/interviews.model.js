@@ -32,6 +32,14 @@ interviews.getAll = (callback) => {
     callback(result);
   });
 };
+interviews.existsByApplicationId = (application_id, callback) => {
+  const sqlString = "SELECT COUNT(*) AS count FROM interviews WHERE application_id = ?";
+  db.query(sqlString, [application_id], (err, results) => {
+    if (err) return callback(err);
+    const exists = results[0].count > 0;
+    callback(null, exists); // true nếu tồn tại, false nếu không
+  });
+};
 
 interviews.insert = (interviews, callBack) => {
   const sqlString = "INSERT INTO interviews SET ?";

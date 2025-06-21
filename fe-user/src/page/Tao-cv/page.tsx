@@ -1,13 +1,82 @@
-import { CVEditor } from "@/components/cv-editor/cv-editor"
-import { Header } from "@/components/Header"
-import { Footer } from "@/components/footer"
-import { CVImportSection } from "@/components/cv-import"
+import { useState, useEffect } from "react";
+import { CVEditor } from "@/components/cv-editor/cv-editor";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/footer";
+import { CVImportSection } from "@/components/cv-import";
+import { Button } from "@/components/ui/button";
+import { ChevronRight, Eye, Star, CheckCircle, Share2, Bookmark, ArrowRight } from "lucide-react";
+import { Link, useParams } from "react-router-dom";
+import axios from "axios";
+import { toast } from "sonner";
+
+interface CVTemplate {
+  template_id: number;
+  name: string;
+  thumbnail_url: string;
+  description: string;
+  html_structure: string;
+  css_styles: string;
+  category_id: number;
+  is_premium: boolean;
+  price: string;
+  popularity_score: number;
+  category_name: string;
+}
 
 export default function CVCreatePage() {
+  const { id } = useParams<{ id: string }>();
+  const [template, setTemplate] = useState<CVTemplate | null>(null);
+  const [htmlContent, setHtmlContent] = useState<string>("");
+  const [cssContent, setCssContent] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (id) {
+      fetchTemplate();
+    }
+  }, [id]);
+
+  const fetchTemplate = async () => {
+    setIsLoading(true);
+    try {
+      const res = await axios.get(`http://localhost:3000/cv_templatess/public/${id}`);
+      setTemplate(res.data);
+      setHtmlContent(res.data.html_structure || "");
+      setCssContent(res.data.css_styles || "body { font-family: Arial; }");
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Lỗi tải mẫu CV");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!template || !htmlContent || !cssContent) return;
+
+    try {
+      await axios.put(`http://localhost:3000/cv_templatess/${template.template_id}`, {
+        ...template,
+        html_structure: htmlContent,
+        css_styles: cssContent,
+      });
+      toast.success("Lưu CV thành công!");
+    } catch (err: any) {
+      toast.error("Lưu CV thất bại. Vui lòng thử lại!");
+    }
+  };
+
+  if (isLoading) {
+    return <div className="container py-12 text-center">Đang tải...</div>;
+  }
+
+  if (!template) {
+    return <div className="container py-12 text-center">Mẫu CV không tồn tại</div>;
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white border-b border-gray-200">
-                <Header></Header>
+        <Header />
       </header>
 
       <div className="border-b border-gray-200 bg-white">
@@ -20,7 +89,7 @@ export default function CVCreatePage() {
                 clipRule="evenodd"
               />
             </svg>
-            <span className="font-medium">CV lập trình viên</span>
+            <span className="font-medium">{template.name}</span>
           </div>
           <div className="ml-auto flex items-center space-x-2">
             <button className="p-2 text-gray-500 hover:text-gray-700">
@@ -48,7 +117,7 @@ export default function CVCreatePage() {
               </svg>
               Xem trước
             </button>
-            <button className="bg-emerald-600 text-white px-4 py-2 rounded flex items-center text-sm font-medium">
+            <Button className="bg-emerald-600 text-white px-4 py-2 rounded flex items-center text-sm font-medium" onClick={handleSave}>
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
                 <path
                   fillRule="evenodd"
@@ -57,15 +126,16 @@ export default function CVCreatePage() {
                 />
               </svg>
               Lưu CV
-            </button>
+            </Button>
           </div>
         </div>
       </div>
 
       <main>
-        <CVEditor />
+        <CVEditor htmlContent={htmlContent} cssContent={cssContent} onUpdateHtml={setHtmlContent} onUpdateCss={setCssContent} />
+        <CVImportSection />
       </main>
-      <Footer></Footer>
+      <Footer />
     </div>
-  )
+  );
 }

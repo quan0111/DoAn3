@@ -45,6 +45,7 @@ export interface CVTemplate {
   isPremium?: boolean
   category: string
   industries: string[]
+  customStyles?: string; // Thêm thuộc tính tùy chọn này
 }
 
 export interface CVData {

@@ -16,16 +16,16 @@ module.exports = {
   },
 
   insert: (req, res) => {
-    const events = req.body;
-    events.insert(events, (result) => {
+    const newevents = req.body;
+    events.insert(newevents, (result) => {
       res.send(result);
     });
   },
 
   update: (req, res) => {
-    const events = req.body;
+    const updatevents = req.body;
     const id = req.params.id;
-    events.update(events, id, (result) => {
+    events.update(updatevents, id, (result) => {
       res.send(result);
     });
   },

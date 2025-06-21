@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { Link } from "react-router-dom"
-import { usePathname } from "next/navigation"
+import { Link } from "react-router-dom";
+import { usePathname } from "next/navigation";
 import {
   BarChart3,
   Users,
@@ -17,15 +17,15 @@ import {
   Settings,
   Bell,
   HelpCircle,
-} from "lucide-react"
+} from "lucide-react";
 
-import { Badge } from "@/components/ui/badge"
+import { Badge } from "@/components/ui/badge";
 
 const sidebarItems = [
   { href: "/", label: "Bảng tin", icon: BarChart3 },
   { href: "/insights", label: "TopCV Insights", icon: TrendingUp },
   { href: "/rewards", label: "TopCV Rewards", icon: Award },
-  { href: "/partners", label: "Đối quả", icon: Users },
+  { href: "/partners", label: "Đối tác", icon: Users },
   { href: "/toppy-ai", label: "Toppy AI - Đề xuất", icon: Zap, badge: "2" },
   { href: "/cv-recommendations", label: "CV đề xuất", icon: FileText },
   { href: "/recruitment-campaigns", label: "Chiến dịch tuyển dụng", icon: Target },
@@ -41,13 +41,13 @@ const sidebarItems = [
   { href: "/account-settings", label: "Cài đặt tài khoản", icon: Settings },
   { href: "/notifications", label: "Thông báo hệ thống", icon: Bell, badge: "57" },
   { href: "/support", label: "Hỗ trợ hỗ trợ", icon: HelpCircle },
-]
+];
 
 export function Sidebar() {
-  const pathname = usePathname()
+  const pathname = usePathname();
 
   return (
-    <aside className="w-64 bg-white shadow-sm min-h-screen">
+    <aside className="w-64 bg-white shadow-sm min-h-screen fixed top-0 left-0 z-20" style={{ top: "64px" }}>
       <div className="p-4">
         <div className="flex items-center space-x-3 mb-6">
           <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white font-bold">
@@ -83,5 +83,5 @@ export function Sidebar() {
         </nav>
       </div>
     </aside>
-  )
+  );
 }

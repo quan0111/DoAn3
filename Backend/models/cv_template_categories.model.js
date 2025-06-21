@@ -8,13 +8,21 @@ const cv_template_categories = (cv_template_categories) => {
   this.icon_url = cv_template_categories.icon_url;
 };
 
+cv_template_categories.getByName = (name, callback) => {
+  const sqlString = "SELECT * FROM cv_template_categories WHERE name = ?";
+  db.query(sqlString, [name], (err, result) => {
+    if (err) return callback(err);
+    callback(null, result);
+  });
+};
+
 cv_template_categories.getById = (id, callback) => {
   const sqlString = "SELECT * FROM cv_template_categories WHERE category_id = ? ";
   db.query(sqlString, id, (err, result) => {
     if (err) {
       return callback(err);
     }
-    callback(result);
+    callback(null,result);
   });
 };
 
@@ -24,7 +32,7 @@ cv_template_categories.getAll = (callback) => {
     if (err) {
       return callback(err);
     }
-    callback(result);
+    callback(null,result);
   });
 };
 
@@ -39,25 +47,22 @@ cv_template_categories.insert = (cv_template_categories, callBack) => {
   });
 };
 
-cv_template_categories.update = (cv_template_categories, id, callBack) => {
+cv_template_categories.update = (data, id, callBack) => {
   const sqlString = "UPDATE cv_template_categories SET ? WHERE category_id = ?";
-  db.query(sqlString, [cv_template_categories, id], (err, res) => {
-    if (err) {
-      callBack(err);
-      return;
-    }
-    callBack("cập nhật cv_template_categories có category_id = " + id + " thành công");
+  db.query(sqlString, [data, id], (err, res) => {
+    if (err) return callBack(err);
+    if (res.affectedRows === 0) return callBack(`Không tìm thấy category_id = ${id}`);
+    callBack(null, `Cập nhật category_id = ${id} thành công`);
   });
 };
 
 cv_template_categories.delete = (id, callBack) => {
-  db.query(`DELETE FROM cv_template_categories WHERE category_id = ?`, id, (err, res) => {
-    if (err) {
-      callBack(err);
-      return;
-    }
-    callBack("xóa cv_template_categories có id = " + id + " thành công");
+  db.query("DELETE FROM cv_template_categories WHERE category_id = ?", id, (err, res) => {
+    if (err) return callBack(err);
+    if (res.affectedRows === 0) return callBack(`Không tìm thấy category_id = ${id}`);
+    callBack(null, `Xóa category_id = ${id} thành công`);
   });
 };
+
 
 module.exports = cv_template_categories;

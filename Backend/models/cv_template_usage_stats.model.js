@@ -18,6 +18,47 @@ cv_template_usage_stats.getById = (id, callback) => {
     callback(result);
   });
 };
+cv_template_usage_stats.getByTemplateId = (template_id, callback) => {
+  const sqlString = "SELECT * FROM cv_template_usage_stats WHERE template_id = ?";
+  db.query(sqlString, [template_id], (err, result) => {
+    if (err) return callback(err);
+    callback(null, result[0]);
+  });
+};
+cv_template_usage_stats.increaseViews = (template_id, callback) => {
+  const sqlString = `
+    UPDATE cv_template_usage_stats 
+    SET views = views + 1 
+    WHERE template_id = ?
+  `;
+  db.query(sqlString, [template_id], (err, res) => {
+    if (err) return callback(err);
+    callback(null, "Tăng views thành công");
+  });
+};
+cv_template_usage_stats.increaseDownloads = (template_id, callback) => {
+  const sqlString = `
+    UPDATE cv_template_usage_stats 
+    SET downloads = downloads + 1 
+    WHERE template_id = ?
+  `;
+  db.query(sqlString, [template_id], (err, res) => {
+    if (err) return callback(err);
+    callback(null, "Tăng views thành công");
+  });
+};
+cv_template_usage_stats.increaseUses = (template_id, callback) => {
+  const sqlString = `
+    UPDATE cv_template_usage_stats 
+    SET uses = uses + 1 
+    WHERE template_id = ?
+  `;
+  db.query(sqlString, [template_id], (err, res) => {
+    if (err) return callback(err);
+    callback(null, "Tăng views thành công");
+  });
+};
+
 
 cv_template_usage_stats.getAll = (callback) => {
   const sqlString = "SELECT * FROM cv_template_usage_stats ";

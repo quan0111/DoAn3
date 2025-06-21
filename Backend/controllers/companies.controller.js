@@ -20,49 +20,69 @@ module.exports = {
       res.send(result);
     });
   },
+    getByUserId: (req, res) => {
+    const id = req.params.id;
+    companies.getByUserId(id, (err, result) => {
+      if (err) return res.status(500).send({ error: err.message });
+      res.send(result);
+    });
+  },
 
   // Thêm company mới (hỗ trợ upload logo)
-  insert: [
-    upload.single("logo"), // Xử lý file logo
-    (req, res) => {
-      const companyData = req.body;
-      // Nếu có file ảnh, thêm logo_url vào companyData
-      if (req.file) {
-        companyData.logo_url = `/uploads/${req.file.filename}`;
-      }
-      companies.insert(companyData, (err, result) => {
-        if (err) return res.status(500).send({ error: err.message });
-        res.send(result);
-      });
-    },
-  ],
+insert: [
+  upload.single("logo"),
+  (req, res) => {
+    const companyData = req.body;
+
+    // ✅ Ép kiểu industry thành chuỗi nếu là mảng
+    if (Array.isArray(companyData.industry)) {
+      companyData.industry = JSON.stringify(companyData.industry);
+    }
+
+    if (req.file) {
+      companyData.logo_url = `/uploads/${req.file.filename}`;
+    }
+
+    companies.insert(companyData, (err, result) => {
+      if (err) return res.status(500).send({ error: err.message });
+      res.send(result);
+    });
+  },
+],
+
 
   // Cập nhật company (hỗ trợ upload logo)
-  update: [
-    upload.single("logo"), // Xử lý file logo
-    (req, res) => {
-      const companyData = req.body;
-      const id = req.params.id;
-      // Nếu có file ảnh, cập nhật logo_url
-      if (req.file) {
-        companyData.logo_url = `/uploads/${req.file.filename}`;
-        // Xóa ảnh cũ nếu có
-        companies.getById(id, (err, oldCompany) => {
-          if (err) return;
-          if (oldCompany && oldCompany.logo_url) {
-            const oldPath = path.join(__dirname, "..", oldCompany.logo_url);
-            if (fs.existsSync(oldPath)) {
-              fs.unlinkSync(oldPath);
-            }
+update: [
+  upload.single("logo"),
+  (req, res) => {
+    const companyData = req.body;
+    const id = req.params.id;
+
+    // ✅ Ép kiểu industry thành chuỗi nếu là mảng
+    if (Array.isArray(companyData.industry)) {
+      companyData.industry = JSON.stringify(companyData.industry);
+    }
+
+    if (req.file) {
+      companyData.logo_url = `/uploads/${req.file.filename}`;
+      companies.getById(id, (err, oldCompany) => {
+        if (err) return;
+        if (oldCompany && oldCompany.logo_url) {
+          const oldPath = path.join(__dirname, "..", oldCompany.logo_url);
+          if (fs.existsSync(oldPath)) {
+            fs.unlinkSync(oldPath);
           }
-        });
-      }
-      companies.update(companyData, id, (err, result) => {
-        if (err) return res.status(500).send({ error: err.message });
-        res.send(result);
+        }
       });
-    },
-  ],
+    }
+
+    companies.update(companyData, id, (err, result) => {
+      if (err) return res.status(500).send({ error: err.message });
+      res.send(result);
+    });
+  },
+],
+
 
   // Xóa company
   delete: (req, res) => {

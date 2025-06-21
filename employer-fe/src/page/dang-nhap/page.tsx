@@ -1,11 +1,84 @@
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ArrowRight, Mail, LockKeyhole, Building } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Toaster, toast } from "sonner";
+import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Checkbox } from "@/components/ui/checkbox"
-import { ArrowRight, Mail, LockKeyhole, Building } from "lucide-react"
-import { Link } from "react-router-dom"
+interface FormData {
+  email: string;
+  password: string;
+  remember: boolean;
+}
+
+interface JwtPayload {
+  role: string;
+}
 
 export default function EmployerLoginPage() {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState<FormData>({
+    email: "",
+    password: "",
+    remember: false,
+  });
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      // Gọi API đăng nhập
+      const response = await axios.post("http://localhost:3000/auth/", {
+        email: formData.email,
+        password: formData.password,
+      });
+
+      if (response.status === 200 && response.data.token) {
+        const token = response.data.token;
+        // Giải mã token để kiểm tra role
+        const decoded: JwtPayload = jwtDecode(token);
+        if (decoded.role !== "employer") {
+          throw new Error("Tài khoản không phải nhà tuyển dụng");
+        }
+
+        // Lưu token vào localStorage
+        localStorage.setItem("token", token);
+        if (formData.remember) {
+          // Lưu thông tin đăng nhập nếu chọn "Ghi nhớ"
+          localStorage.setItem("rememberedEmail", formData.email);
+        } else {
+          localStorage.removeItem("rememberedEmail");
+        }
+
+        toast.success("Đăng nhập thành công!");
+        setTimeout(() => {
+          navigate("/");
+        }, 2000);
+      } else {
+        throw new Error("Đăng nhập thất bại");
+      }
+    } catch (error: any) {
+      console.error("Lỗi đăng nhập:", error);
+      const errorMessage = error.response?.data?.message || error.message || "Đăng nhập thất bại. Vui lòng thử lại.";
+      toast.error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="flex min-h-screen flex-col">
       <main className="flex-1">
@@ -53,7 +126,7 @@ export default function EmployerLoginPage() {
                 <p className="mt-2 text-gray-500">Nhập thông tin của bạn để đăng nhập vào tài khoản nhà tuyển dụng</p>
               </div>
 
-              <div className="grid gap-4">
+              <form onSubmit={handleSubmit} className="grid gap-4">
                 <div className="grid gap-2">
                   <label htmlFor="email" className="text-sm font-medium">
                     Email
@@ -62,10 +135,14 @@ export default function EmployerLoginPage() {
                     <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
                     <Input
                       id="email"
+                      name="email"
                       placeholder="company@example.com"
                       type="email"
                       className="pl-10"
                       autoComplete="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      required
                     />
                   </div>
                 </div>
@@ -81,21 +158,41 @@ export default function EmployerLoginPage() {
                   </div>
                   <div className="relative">
                     <LockKeyhole className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-                    <Input id="password" type="password" className="pl-10" autoComplete="current-password" />
+                    <Input
+                      id="password"
+                      name="password"
+                      type="password"
+                      className="pl-10"
+                      autoComplete="current-password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      required
+                    />
                   </div>
                 </div>
 
                 <div className="flex items-center space-x-2">
-                  <Checkbox id="remember" />
+                  <Checkbox
+                    id="remember"
+                    name="remember"
+                    checked={formData.remember}
+                    onCheckedChange={(checked) =>
+                      setFormData((prev) => ({ ...prev, remember: checked as boolean }))
+                    }
+                  />
                   <label htmlFor="remember" className="text-sm text-gray-500">
                     Ghi nhớ đăng nhập
                   </label>
                 </div>
 
-                <Button className="bg-green-600 hover:bg-green-700">
-                  Đăng nhập <ArrowRight className="ml-2 h-4 w-4" />
+                <Button
+                  type="submit"
+                  className="bg-green-600 hover:bg-green-700"
+                  disabled={loading}
+                >
+                  {loading ? "Đang đăng nhập..." : "Đăng nhập"} <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
-              </div>
+              </form>
 
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
@@ -110,7 +207,7 @@ export default function EmployerLoginPage() {
                 <Button variant="outline">
                   <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                     <path
-                      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                      d="M22.56 12.25c0-.78-.07-1.53-.20-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
                       fill="#4285F4"
                     />
                     <path
@@ -122,7 +219,7 @@ export default function EmployerLoginPage() {
                       fill="#FBBC05"
                     />
                     <path
-                      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.60 3.30-4.53 6.16-4.53z"
                       fill="#EA4335"
                     />
                   </svg>
@@ -144,6 +241,7 @@ export default function EmployerLoginPage() {
           </div>
         </div>
       </main>
+      <Toaster />
     </div>
-  )
+  );
 }

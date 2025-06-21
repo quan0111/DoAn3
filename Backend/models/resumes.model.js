@@ -1,7 +1,6 @@
-
 const db = require("../common/db");
 
-const resumes = (resumes) => {
+const Resumes = function (resumes) {
   this.resume_id = resumes.resume_id;
   this.user_id = resumes.user_id;
   this.title = resumes.title;
@@ -11,63 +10,87 @@ const resumes = (resumes) => {
   this.skills = resumes.skills;
   this.certificates = resumes.certificates;
   this.file_url = resumes.file_url;
-  this.is_public = resumes.is_public;
-  this.verified_status = resumes.verified_status;
-  this.view_count = resumes.view_count;
-  this.created_at = resumes.created_at;
-  this.updated_at = resumes.updated_at;
+  this.is_public = resumes.is_public || false;
+  this.verified_status = resumes.verified_status || "pending";
+  this.view_count = resumes.view_count || 0;
+  this.created_at = resumes.created_at || new Date();
+  this.updated_at = resumes.updated_at || new Date();
 };
 
-resumes.getById = (id, callback) => {
-  const sqlString = "SELECT * FROM resumes WHERE resume_id = ? ";
-  db.query(sqlString, id, (err, result) => {
-    if (err) {
-      return callback(err);
-    }
-    callback(result);
+// Lấy resume theo ID (kèm thông tin user và số lượng ứng tuyển)
+Resumes.getById = (id, callback) => {
+  const sql = `
+    SELECT r.*, u.name AS user_name, COUNT(a.application_id) AS total_applications
+    FROM resumes r
+    LEFT JOIN users u ON r.user_id = u.user_id
+    LEFT JOIN applications a ON r.resume_id = a.resume_id
+    WHERE r.resume_id = ?
+    GROUP BY r.resume_id
+  `;
+  db.query(sql, [id], (err, results) => {
+    if (err) return callback(err);
+    callback(null, results[0]);
   });
 };
 
-resumes.getAll = (callback) => {
-  const sqlString = "SELECT * FROM resumes ";
-  db.query(sqlString, (err, result) => {
-    if (err) {
-      return callback(err);
-    }
-    callback(result);
+// Lấy tất cả resume kèm user và thống kê ứng tuyển
+Resumes.getAll = (callback) => {
+  const sql = `
+    SELECT r.*, u.name AS user_name, COUNT(a.application_id) AS total_applications
+    FROM resumes r
+    LEFT JOIN users u ON r.user_id = u.user_id
+    LEFT JOIN applications a ON r.resume_id = a.resume_id
+    GROUP BY r.resume_id
+  `;
+  db.query(sql, (err, results) => {
+    if (err) return callback(err);
+    callback(null, results);
   });
 };
 
-resumes.insert = (resumes, callBack) => {
-  const sqlString = "INSERT INTO resumes SET ?";
-  db.query(sqlString, resumes, (err, res) => {
-    if (err) {
-      callBack(err);
-      return;
-    }
-    callBack({ id: res.insertId, ...resumes });
+// Lấy resume theo user_id + template name (nếu có)
+Resumes.getByUserId = (userId, callback) => {
+  const sql = `
+    SELECT r.*, t.name AS template_name
+    FROM resumes r
+    LEFT JOIN user_cv_templates t ON r.resume_id = t.resume_id
+    WHERE r.user_id = ?
+  `;
+  db.query(sql, [userId], (err, results) => {
+    if (err) return callback(err);
+    callback(null, results);
   });
 };
 
-resumes.update = (resumes, id, callBack) => {
-  const sqlString = "UPDATE resumes SET ? WHERE resume_id = ?";
-  db.query(sqlString, [resumes, id], (err, res) => {
-    if (err) {
-      callBack(err);
-      return;
-    }
-    callBack("cập nhật resumes có id = " + id + " thành công");
+// Các hàm insert, update, delete giữ nguyên như cũ
+Resumes.insert = (data, callback) => {
+  db.query("INSERT INTO resumes SET ?", data, (err, res) => {
+    if (err) return callback(err);
+    callback(null, { id: res.insertId, ...data });
   });
 };
 
-resumes.delete = (id, callBack) => {
-  db.query(`DELETE FROM resumes WHERE resume_id = ?`, id, (err, res) => {
-    if (err) {
-      callBack(err);
-      return;
-    }
-    callBack("xóa resumes có id = " + id + " thành công");
+Resumes.update = (data, id, callback) => {
+  data.updated_at = new Date();
+  db.query("UPDATE resumes SET ? WHERE resume_id = ?", [data, id], (err, res) => {
+    if (err) return callback(err);
+    callback(null, { message: `Cập nhật resume ID ${id} thành công` });
   });
 };
 
-module.exports = resumes;
+Resumes.delete = (id, callback) => {
+  db.query("DELETE FROM resumes WHERE resume_id = ?", [id], (err, res) => {
+    if (err) return callback(err);
+    callback(null, { message: `Xóa resume ID ${id} thành công` });
+  });
+};
+
+// Tăng lượt xem
+Resumes.incrementView = (id, callback) => {
+  db.query("UPDATE resumes SET view_count = view_count + 1 WHERE resume_id = ?", [id], (err, res) => {
+    if (err) return callback(err);
+    callback(null, { message: `Tăng view resume ID ${id}` });
+  });
+};
+
+module.exports = Resumes;

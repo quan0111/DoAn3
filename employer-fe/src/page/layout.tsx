@@ -9,7 +9,7 @@ export default function MainLayout() {
       <Header />
       <div className="flex">
         <Sidebar />
-        <main className="flex-1 p-6">
+        <main className="flex-1 p-6" style={{ marginLeft: "256px", marginTop: "64px" }}>
           <div className="max-w-7xl mx-auto">
             <Outlet /> {/* Render các trang con */}
           </div>

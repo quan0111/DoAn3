@@ -1,4 +1,3 @@
-
 const db = require("../common/db");
 
 const user_cv_templates = (user_cv_templates) => {
@@ -11,55 +10,77 @@ const user_cv_templates = (user_cv_templates) => {
   this.custom_css = user_cv_templates.custom_css;
 };
 
+// === Lấy theo ID ===
 user_cv_templates.getById = (id, callback) => {
-  const sqlString = "SELECT * FROM user_cv_templates WHERE id = ? ";
-  db.query(sqlString, id, (err, result) => {
-    if (err) {
-      return callback(err);
-    }
-    callback(result);
+  const sql = "SELECT * FROM user_cv_templates WHERE user_cv_id = ?";
+  db.query(sql, [id], (err, result) => {
+    if (err) return callback(err);
+    callback(null, result[0]);
   });
 };
 
+// === Lấy tất cả ===
 user_cv_templates.getAll = (callback) => {
-  const sqlString = "SELECT * FROM user_cv_templates ";
-  db.query(sqlString, (err, result) => {
-    if (err) {
-      return callback(err);
-    }
-    callback(result);
+  db.query("SELECT * FROM user_cv_templates", (err, result) => {
+    if (err) return callback(err);
+    callback(null, result);
   });
 };
 
-user_cv_templates.insert = (user_cv_templates, callBack) => {
-  const sqlString = "INSERT INTO user_cv_templates SET ?";
-  db.query(sqlString, user_cv_templates, (err, res) => {
-    if (err) {
-      callBack(err);
-      return;
-    }
-    callBack({ id: res.insertId, ...user_cv_templates });
+// === Lấy theo User ID ===
+user_cv_templates.getByUserId = (user_id, callback) => {
+  db.query("SELECT * FROM user_cv_templates WHERE user_id = ?", [user_id], (err, result) => {
+    if (err) return callback(err);
+    callback(null, result);
   });
 };
 
-user_cv_templates.update = (user_cv_templates, id, callBack) => {
-  const sqlString = "UPDATE user_cv_templates SET ? WHERE id = ?";
-  db.query(sqlString, [user_cv_templates, id], (err, res) => {
-    if (err) {
-      callBack(err);
-      return;
-    }
-    callBack("cập nhật user_cv_templates có id = " + id + " thành công");
+// === Lấy theo Resume ID ===
+user_cv_templates.getByResumeId = (resume_id, callback) => {
+  db.query("SELECT * FROM user_cv_templates WHERE resume_id = ?", [resume_id], (err, result) => {
+    if (err) return callback(err);
+    callback(null, result);
   });
 };
 
-user_cv_templates.delete = (id, callBack) => {
-  db.query(`DELETE FROM user_cv_templates WHERE id = ?`, id, (err, res) => {
-    if (err) {
-      callBack(err);
-      return;
-    }
-    callBack("xóa user_cv_templates có id = " + id + " thành công");
+// === Lấy theo Template ID gốc ===
+user_cv_templates.getByTemplateId = (template_id, callback) => {
+  db.query("SELECT * FROM user_cv_templates WHERE template_id = ?", [template_id], (err, result) => {
+    if (err) return callback(err);
+    callback(null, result);
+  });
+};
+
+// === Tìm theo tên CV Template (LIKE) ===
+user_cv_templates.searchByName = (keyword, callback) => {
+  const search = `%${keyword}%`;
+  db.query("SELECT * FROM user_cv_templates WHERE name LIKE ?", [search], (err, result) => {
+    if (err) return callback(err);
+    callback(null, result);
+  });
+};
+
+// === Thêm mới ===
+user_cv_templates.insert = (data, callback) => {
+  db.query("INSERT INTO user_cv_templates SET ?", data, (err, res) => {
+    if (err) return callback(err);
+    callback(null, { id: res.insertId, ...data });
+  });
+};
+
+// === Cập nhật ===
+user_cv_templates.update = (data, id, callback) => {
+  db.query("UPDATE user_cv_templates SET ? WHERE user_cv_id = ?", [data, id], (err, res) => {
+    if (err) return callback(err);
+    callback(null, `Cập nhật user_cv_templates có id = ${id} thành công`);
+  });
+};
+
+// === Xóa ===
+user_cv_templates.delete = (id, callback) => {
+  db.query("DELETE FROM user_cv_templates WHERE user_cv_id = ?", [id], (err, res) => {
+    if (err) return callback(err);
+    callback(null, `Xóa user_cv_templates có id = ${id} thành công`);
   });
 };
 

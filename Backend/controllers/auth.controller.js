@@ -33,7 +33,7 @@ module.exports = {
       const token = jwt.sign(
         { userId: user.user_id, email: user.email, role :user.role },
         SECRET_KEY,
-        { expiresIn: "1h" }
+        { expiresIn: "10h" }
       );
 
       res.json({

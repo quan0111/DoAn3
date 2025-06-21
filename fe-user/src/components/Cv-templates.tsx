@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button"
-
+import { Link } from "react-router-dom"
 export function Templates() {
   return (
     <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-50">
@@ -19,7 +19,7 @@ export function Templates() {
               className="group relative overflow-hidden rounded-lg border bg-background shadow-sm transition-all hover:shadow-md"
             >
               <img
-                src={`/placeholder.svg?height=500&width=350&text=Mẫu ${i}`}
+                src={`public/cv${i}.webp`} // giả sử ảnh là public/cv1.png, cv2.png,...
                 alt={`Mẫu CV ${i}`}
                 className="aspect-[3/4] w-full object-cover"
                 width={350}
@@ -40,9 +40,11 @@ export function Templates() {
           ))}
         </div>
         <div className="flex justify-center">
+          <Link to="mau-cv">
           <Button variant="outline" size="lg" className="border-green-600 text-green-600 hover:bg-green-50">
             Xem Tất Cả Mẫu
           </Button>
+          </Link>
         </div>
       </div>
     </section>

@@ -1,11 +1,74 @@
-import { Header } from "@/components/Header"
-import { Footer } from "@/components/footer"
-import { Button } from "@/components/ui/button"
-import { ChevronRight, Eye, Star, CheckCircle, Share2, Bookmark, ArrowRight } from "lucide-react"
-import { Link, useParams } from "react-router-dom"
+"use client";
+
+import { useState, useEffect } from "react";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/footer";
+import { Button } from "@/components/ui/button";
+import { ChevronRight, Eye, Star, CheckCircle, Share2, Bookmark, ArrowRight } from "lucide-react";
+import { Link, useParams } from "react-router-dom";
+import axios from "axios";
+import { toast } from "sonner";
+
+interface CVTemplate {
+  template_id: number;
+  name: string;
+  thumbnail_url: string;
+  description: string;
+  is_premium: boolean;
+  category_id: number;
+  category_name: string;
+  average_rating: number;
+  rating_count: number;
+}
+
+interface RelatedTemplate {
+  template_id: number;
+  name: string;
+  thumbnail_url: string;
+}
 
 export default function CVTemplateDetailPage() {
-    const { id } = useParams<{ id: string }>()
+  const { id } = useParams<{ id: string }>();
+  const [template, setTemplate] = useState<CVTemplate | null>(null);
+  const [relatedTemplates, setRelatedTemplates] = useState<RelatedTemplate[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (id) {
+      fetchTemplate();
+      fetchRelatedTemplates();
+    }
+  }, [id]);
+
+  const fetchTemplate = async () => {
+    setIsLoading(true);
+    try {
+      const res = await axios.get(`http://localhost:3000/cv_templatess/public/${id}`);
+      setTemplate(res.data);
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Lỗi tải chi tiết mẫu CV");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchRelatedTemplates = async () => {
+    try {
+      const res = await axios.get(`http://localhost:3000/cv_templatess/public/related/${id}`);
+      setRelatedTemplates(res.data);
+    } catch (err: any) {
+      console.error("Error fetching related templates:", err);
+    }
+  };
+
+  if (isLoading) {
+    return <div className="container py-12 text-center">Đang tải...</div>;
+  }
+
+  if (!template) {
+    return <div className="container py-12 text-center">Mẫu CV không tồn tại</div>;
+  }
+
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
@@ -22,7 +85,7 @@ export default function CVTemplateDetailPage() {
                 Mẫu CV
               </Link>
               <ChevronRight className="h-3 w-3 text-gray-400" />
-              <span className="font-medium">CV Chuyên Nghiệp {id}</span>
+              <span className="font-medium">{template.name}</span>
             </div>
           </div>
         </div>
@@ -36,8 +99,8 @@ export default function CVTemplateDetailPage() {
                 <div className="sticky top-24">
                   <div className="overflow-hidden rounded-lg border shadow-lg">
                     <img
-                      src={`/placeholder.svg?height=800&width=600&text=Mẫu CV ${id}`}
-                      alt={`Mẫu CV ${id}`}
+                      src={`http://localhost:3000/${template.thumbnail_url}` || `/placeholder.svg?height=800&width=600&text=${template.name}`}
+                      alt={template.name}
                       className="h-auto w-full"
                     />
                   </div>
@@ -49,35 +112,31 @@ export default function CVTemplateDetailPage() {
                 <div className="mb-4 flex items-center gap-2">
                   <span
                     className={`rounded-full px-3 py-1 text-xs font-medium ${
-                      Number(id) % 2 === 0 ? "bg-green-100 text-green-600" : "bg-blue-100 text-blue-600"
+                      template.is_premium ? "bg-blue-100 text-blue-600" : "bg-green-100 text-green-600"
                     }`}
                   >
-                    {Number(id) % 2 === 0 ? "Miễn phí" : "Cao cấp"}
+                    {template.is_premium ? "Cao cấp" : "Miễn phí"}
                   </span>
                   <div className="flex items-center gap-1 text-yellow-400">
                     {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="h-4 w-4 fill-current" />
+                      <Star
+                        key={i}
+                        className={`h-4 w-4 ${i < Math.round(template.average_rating) ? "fill-current" : ""}`}
+                      />
                     ))}
-                    <span className="ml-1 text-xs text-gray-500">(245 đánh giá)</span>
+                    <span className="ml-1 text-xs text-gray-500">({template.rating_count} đánh giá)</span>
                   </div>
                 </div>
 
-                <h1 className="mb-4 text-3xl font-bold">CV Chuyên Nghiệp {id}</h1>
-                <p className="mb-6 text-gray-600">
-                  Mẫu CV chuyên nghiệp, hiện đại với thiết kế tinh tế và cấu trúc rõ ràng. Phù hợp với các ứng viên
-                  trong lĩnh vực{" "}
-                  {Number(id) % 3 === 0
-                    ? "tiếp thị và truyền thông"
-                    : Number(id) % 2 === 0
-                      ? "công nghệ thông tin"
-                      : "tài chính kế toán"}
-                  .
-                </p>
+                <h1 className="mb-4 text-3xl font-bold">{template.name}</h1>
+                <p className="mb-6 text-gray-600">{template.description}</p>
 
                 <div className="mb-8 flex flex-wrap gap-4">
-                  <Button size="lg" className="bg-green-600 hover:bg-green-700">
-                    Sử Dụng Mẫu Này <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
+                  <Link to={`/tao-cv/${template.template_id}`} className="bg-green-600 hover:bg-green-700">
+                    <Button size="lg" className="w-full">
+                      Sử Dụng Mẫu Này <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </Link>
                   <Button size="lg" variant="outline" className="border-green-600 text-green-600 hover:bg-green-50">
                     <Eye className="mr-2 h-4 w-4" /> Xem Trước
                   </Button>
@@ -111,32 +170,30 @@ export default function CVTemplateDetailPage() {
                 <div className="mb-8">
                   <h2 className="mb-4 text-xl font-semibold">Mô tả</h2>
                   <div className="space-y-3 text-gray-600">
-                    <p>
-                      CV Chuyên Nghiệp {id} là lựa chọn hoàn hảo cho những ứng viên muốn tạo ấn tượng mạnh mẽ với
-                      nhà tuyển dụng. Thiết kế hiện đại kết hợp với cấu trúc rõ ràng giúp thông tin của bạn được trình
-                      bày một cách chuyên nghiệp và dễ tiếp cận.
-                    </p>
-                    <p>
-                      Mẫu CV này được tối ưu hóa để vượt qua các hệ thống lọc CV tự động (ATS), đảm bảo hồ sơ của bạn
-                      được đến tay nhà tuyển dụng. Với nhiều phần được thiết kế tinh tế, bạn có thể dễ dàng trình bày
-                      kinh nghiệm, kỹ năng và học vấn của mình một cách hiệu quả.
-                    </p>
+                    <p>{template.description}</p>
                   </div>
                 </div>
 
                 <div>
                   <h2 className="mb-4 text-xl font-semibold">Mẫu CV liên quan</h2>
                   <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-                    {[1, 2, 3].map((id) => (
-                      <Link to={`/mau-cv/${Number(id) + id}`} key={id} className="group block">
+                    {relatedTemplates.map((related) => (
+                      <Link
+                        to={`/mau-cv/${related.template_id}`}
+                        key={related.template_id}
+                        className="group block"
+                      >
                         <div className="overflow-hidden rounded-lg border shadow">
                           <img
-                            src={`/placeholder.svg?height=300&width=200&text=Mẫu ${Number(id) + id}`}
-                            alt={`Mẫu CV ${Number(id) + id}`}
+                            src={
+                              `http://localhost:3000/${related.thumbnail_url}` ||
+                              `/placeholder.svg?height=300&width=200&text=${related.name}`
+                            }
+                            alt={related.name}
                             className="h-32 w-full object-cover transition-transform duration-300 group-hover:scale-105"
                           />
                           <div className="p-2 text-center">
-                            <span className="text-xs font-medium">Mẫu CV {Number(id) + id}</span>
+                            <span className="text-xs font-medium">{related.name}</span>
                           </div>
                         </div>
                       </Link>
@@ -163,5 +220,5 @@ export default function CVTemplateDetailPage() {
       </main>
       <Footer />
     </div>
-  )
+  );
 }

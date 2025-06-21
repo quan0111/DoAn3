@@ -1,9 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { FeedbackManagement } from "./feedback-manage";
+import { TransactionHistory } from "./transaction-history";
+import { useState,useEffect } from "react";
 import { Sidebar } from "./sidebar";
 import { Header } from "./header";
 import { DashboardOverview } from "./dashboard-overview";
+import EventManagement from "./event-manage";
 import { ServiceManagement } from "./service-manage";
 import { JobManagement } from "./job-management";
 import { CVManagement } from "./cv-management";
@@ -15,10 +18,19 @@ import { EmployerManagement } from "./employer-management";
 import { ReportsPage } from "./report";
 import { SendNotification } from "./send-nofication";
 import { NotificationHistory } from "./nofication-history";
+import Cookies from "js-cookie";
 
 export function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("dashboard");
-
+  
+  const Logout = () => {
+    Cookies.remove('token')
+  }
+    useEffect(() => {
+    if (activeTab === "logout") {
+      Logout();
+    }
+  }, [activeTab]);
   const renderContent = () => {
     switch (activeTab) {
       case "dashboard":
@@ -35,6 +47,10 @@ export function AdminDashboard() {
         return <NotificationHistory />;
       case "report":
         return <ReportsPage />;
+      case "transaction":
+        return <TransactionHistory></TransactionHistory>;
+      case"feedback":
+        return <FeedbackManagement></FeedbackManagement>;
       case "jobs":
         return <JobManagement />;
       case "cvs":
@@ -43,8 +59,12 @@ export function AdminDashboard() {
         return <ServiceManagement />;
       case "analytics":
         return <Analytics />;
+      case "event":
+        return <EventManagement/>;
       case "settings":
         return <Settings />;
+      case "logout":
+        return null;
       default:
         return <DashboardOverview />;
     }

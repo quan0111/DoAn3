@@ -34,29 +34,28 @@ company_followers.insert = (company_followers, callBack) => {
       callBack(err);
       return;
     }
-    callBack({ id: res.insertId, ...company_followers });
+    callBack({...company_followers });
   });
 };
 
-company_followers.update = (company_followers, id, callBack) => {
-  const sqlString = "UPDATE company_followers SET ? WHERE user_id = ?";
-  db.query(sqlString, [company_followers, id], (err, res) => {
-    if (err) {
-      callBack(err);
-      return;
-    }
-    callBack("cập nhật company_followers có id = " + id + " thành công");
+company_followers.update = (data, userId, companyId, callBack) => {
+  const sqlString = "UPDATE company_followers SET ? WHERE user_id = ? AND company_id = ?";
+  db.query(sqlString, [data, userId, companyId], (err, res) => {
+    if (err) return callBack(err);
+    if (res.affectedRows === 0) return callBack(`Không tìm thấy bản ghi user_id=${userId}, company_id=${companyId}`);
+    callBack(null, "Cập nhật thành công");
   });
 };
 
-company_followers.delete = (id, callBack) => {
-  db.query(`DELETE FROM company_followers WHERE user_id = ?`, id, (err, res) => {
-    if (err) {
-      callBack(err);
-      return;
-    }
-    callBack("xóa company_followers có id = " + id + " thành công");
+
+company_followers.delete = (userId, companyId, callBack) => {
+  const sqlString = "DELETE FROM company_followers WHERE user_id = ? AND company_id = ?";
+  db.query(sqlString, [userId, companyId], (err, res) => {
+    if (err) return callBack(err);
+    if (res.affectedRows === 0) return callBack(`Không tìm thấy bản ghi user_id=${userId}, company_id=${companyId}`);
+    callBack(null, "Xóa thành công");
   });
 };
+
 
 module.exports = company_followers;

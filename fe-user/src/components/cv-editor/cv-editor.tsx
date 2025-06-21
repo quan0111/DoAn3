@@ -1,22 +1,29 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Sidebar } from "./sidebar"
-import { CVPreview } from "./cv-preview"
-import { DesignPanel } from "./design-panel"
-import { AddSectionPanel } from "./add-section-panel"
-import { LayoutPanel } from "./layout-panel"
-import { TemplatePanel } from "./template-panel"
-import { LibraryPanel } from "./library-panel"
-import { Alert, AlertTitle } from "@/components/ui/alert"
-import { X } from "lucide-react"
-import { defaultSections } from "@/lib/default-data"
-import type { CVSection, CVTemplate, ActivePanel, CVData } from "@/lib/types"
-import { DndContext, DragOverlay } from "@dnd-kit/core"
+import { useState, useEffect } from "react";
+import { Sidebar } from "./sidebar";
+import { CVPreview } from "./cv-preview";
+import { DesignPanel } from "./design-panel";
+import { AddSectionPanel } from "./add-section-panel";
+import { LayoutPanel } from "./layout-panel";
+import { TemplatePanel } from "./template-panel";
+import { LibraryPanel } from "./library-panel";
+import { Alert, AlertTitle } from "@/components/ui/alert";
+import { X } from "lucide-react";
+import type { CVSection, CVTemplate, ActivePanel, CVData } from "@/lib/types";
+import { DndContext, DragOverlay } from "@dnd-kit/core";
 
-export function CVEditor() {
-  const [activePanel, setActivePanel] = useState<ActivePanel | null>(null)
-  const [sections, setSections] = useState<CVSection[]>(defaultSections)
+interface CVEditorProps {
+  htmlContent: string;
+  cssContent: string;
+  onUpdateHtml: (html: string) => void;
+  onUpdateCss: (css: string) => void;
+}
+
+export function CVEditor({ htmlContent: initialHtmlContent, cssContent: initialCssContent, onUpdateHtml, onUpdateCss }: CVEditorProps) {
+  const [activePanel, setActivePanel] = useState<ActivePanel | null>(null);
+  const [editableHtml, setEditableHtml] = useState<string>(initialHtmlContent);
+  const [cssContent, setCssContent] = useState<string>(initialCssContent); // Thêm state cho cssContent
   const [selectedTemplate, setSelectedTemplate] = useState<CVTemplate>({
     id: "modern",
     name: "Hiện đại",
@@ -25,41 +32,20 @@ export function CVEditor() {
     description: "Mẫu CV hiện đại phù hợp với nhiều ngành nghề sáng tạo.",
     category: "Hiện đại",
     industries: ["Công nghệ", "Thiết kế", "Truyền thông"],
-  })
+  });
+  const [showAlert, setShowAlert] = useState(true);
 
-  const [showAlert, setShowAlert] = useState(true)
-  const [cvData, setCvData] = useState<CVData>({
-    fullName: "Quân Đào",
-    jobTitle: "LẬP TRÌNH VIÊN",
-    phone: "0123 456 789",
-    email: "daoquan356@gmail.com",
-    website: "be.net/tencuaban",
-    location: "Quận X, Thành phố Y",
-  })
+  useEffect(() => {
+    setEditableHtml(initialHtmlContent);
+    setCssContent(initialCssContent); // Cập nhật cssContent khi prop thay đổi
+  }, [initialHtmlContent, initialCssContent]);
 
-  const handleAddSection = (section: CVSection) => {
-    setSections([...sections, { ...section, id: `section-${Date.now()}` }])
-    setActivePanel(null)
-  }
-
-  const handleUpdateSection = (id: string, content: string) => {
-    setSections(sections.map((section) => (section.id === id ? { ...section, content } : section)))
-  }
-
-  const handleRemoveSection = (id: string) => {
-    setSections(sections.filter((section) => section.id !== id))
-  }
-
-  const handleMoveSection = (fromIndex: number, toIndex: number) => {
-    const updatedSections = [...sections]
-    const [movedSection] = updatedSections.splice(fromIndex, 1)
-    updatedSections.splice(toIndex, 0, movedSection)
-    setSections(updatedSections)
-  }
-
-  const handleUpdateCVData = (data: Partial<CVData>) => {
-    setCvData({ ...cvData, ...data })
-  }
+  // Cập nhật customStyles khi cssContent thay đổi
+  useEffect(() => {
+    if (initialCssContent) {
+      setSelectedTemplate((prev) => ({ ...prev, customStyles: initialCssContent }));
+    }
+  }, [initialCssContent]);
 
   return (
     <DndContext>
@@ -67,9 +53,9 @@ export function CVEditor() {
         {showAlert && (
           <Alert className="mb-6 bg-green-50 border-green-100 text-green-800">
             <div className="flex justify-between items-center">
-              <div className="flex items-center w-lg">
+              <div className="flex items-center">
                 <span className="font-medium">Gợi ý:</span>
-                <AlertTitle className="ml-2 w-lg">Bôi đen văn bản để chỉnh sửa cỡ chữ và định dạng!</AlertTitle>
+                <AlertTitle className="ml-2">Bôi đen văn bản để chỉnh sửa cỡ chữ và định dạng!</AlertTitle>
               </div>
               <button onClick={() => setShowAlert(false)} className="text-green-600 hover:text-green-800">
                 <X className="h-4 w-4" />
@@ -85,19 +71,12 @@ export function CVEditor() {
           <div className="lg:col-span-9">
             <div className="relative">
               {activePanel === "design" && <DesignPanel onClose={() => setActivePanel(null)} />}
-
               {activePanel === "add-section" && (
-                <AddSectionPanel onAddSection={handleAddSection} onClose={() => setActivePanel(null)} />
+                <AddSectionPanel onAddSection={() => {}} onClose={() => setActivePanel(null)} />
               )}
-
               {activePanel === "layout" && (
-                <LayoutPanel
-                  sections={sections}
-                  onMoveSection={handleMoveSection}
-                  onClose={() => setActivePanel(null)}
-                />
+                <LayoutPanel sections={[]} onMoveSection={() => {}} onClose={() => setActivePanel(null)} />
               )}
-
               {activePanel === "template" && (
                 <TemplatePanel
                   selectedTemplate={selectedTemplate}
@@ -105,16 +84,13 @@ export function CVEditor() {
                   onClose={() => setActivePanel(null)}
                 />
               )}
-
               {activePanel === "library" && <LibraryPanel onClose={() => setActivePanel(null)} />}
 
               <CVPreview
-                sections={sections}
+                htmlContent={editableHtml}
+                cssContent={selectedTemplate.customStyles || cssContent} // Sử dụng cssContent từ state
+                onUpdateHtml={onUpdateHtml}
                 template={selectedTemplate}
-                cvData={cvData}
-                onUpdateSection={handleUpdateSection}
-                onRemoveSection={handleRemoveSection}
-                onUpdateCVData={handleUpdateCVData}
               />
             </div>
           </div>
@@ -122,5 +98,5 @@ export function CVEditor() {
       </div>
       <DragOverlay />
     </DndContext>
-  )
+  );
 }

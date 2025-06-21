@@ -21,6 +21,42 @@ cv_template_components.getById = (id, callback) => {
     callback(result);
   });
 };
+cv_template_components.getByTemplateId = (template_id, callback) => {
+  const sqlString = `
+    SELECT * FROM cv_template_components 
+    WHERE template_id = ? 
+    ORDER BY display_order ASC
+  `;
+  db.query(sqlString, [template_id], (err, result) => {
+    if (err) return callback(err);
+    callback(null, result);
+  });
+};
+
+cv_template_components.deleteByTemplateId = (template_id, callback) => {
+  const sqlString = `DELETE FROM cv_template_components WHERE template_id = ?`;
+  db.query(sqlString, [template_id], (err, res) => {
+    if (err) return callback(err);
+    callback(null, `Đã xóa tất cả components của template_id = ${template_id}`);
+  });
+};
+cv_template_components.reorder = (template_id, orderedIds, callback) => {
+  const updates = orderedIds.map((id, index) => [index + 1, id, template_id]);
+  const sqlString = "UPDATE cv_template_components SET display_order = ? WHERE component_id = ? AND template_id = ?";
+  
+  let error = null;
+  let completed = 0;
+
+  updates.forEach(([order, id, tid]) => {
+    db.query(sqlString, [order, id, tid], (err) => {
+      if (err && !error) error = err;
+      if (++completed === updates.length) {
+        if (error) return callback(error);
+        callback(null, "Cập nhật thứ tự thành phần thành công");
+      }
+    });
+  });
+};
 
 cv_template_components.getAll = (callback) => {
   const sqlString = "SELECT * FROM cv_template_components ";

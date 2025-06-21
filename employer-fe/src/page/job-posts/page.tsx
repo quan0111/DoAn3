@@ -1,58 +1,69 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Link } from "react-router-dom"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
-import { Plus, FileText, Search, Filter, Eye, Edit, MoreHorizontal, Calendar, MapPin, DollarSign } from "lucide-react"
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import {
+  Plus,
+  FileText,
+  Search,
+  Filter,
+  Eye,
+  Edit,
+  MoreHorizontal,
+  Calendar,
+  MapPin,
+  DollarSign,
+} from "lucide-react";
+import axios from "axios";
+import {jwtDecode} from "jwt-decode";
 
-const jobPosts = [
-  {
-    id: 1,
-    title: "Frontend Developer (React/Vue.js)",
-    category: "Công nghệ thông tin",
-    location: "Hà Nội",
-    salary: "15-25 triệu VND",
-    status: "Đang tuyển",
-    applications: 45,
-    views: 1250,
-    deadline: "2025-06-15",
-    createdAt: "2025-05-20",
-    isHot: true,
-    isUrgent: false,
-  },
-  {
-    id: 2,
-    title: "Marketing Manager",
-    category: "Marketing/PR",
-    location: "TP. Hồ Chí Minh",
-    salary: "20-30 triệu VND",
-    status: "Tạm dừng",
-    applications: 23,
-    views: 890,
-    deadline: "2025-06-10",
-    createdAt: "2025-05-18",
-    isHot: false,
-    isUrgent: true,
-  },
-  {
-    id: 3,
-    title: "Senior Backend Developer",
-    category: "Công nghệ thông tin",
-    location: "Đà Nẵng",
-    salary: "25-40 triệu VND",
-    status: "Đang tuyển",
-    applications: 67,
-    views: 2100,
-    deadline: "2025-06-20",
-    createdAt: "2025-05-15",
-    isHot: true,
-    isUrgent: false,
-  },
-]
+interface Job {
+  job_id: number;
+  company_id: number;
+  title: string;
+  description: string;
+  requirements: string[];
+  benefits: string;
+  salary_min: number;
+  salary_max: number;
+  location: string;
+  job_level: string;
+  job_type: string;
+  deadline: string;
+  status: string;
+  priority_score: number;
+  auto_expire: number;
+  view_count: number;
+  application_count: number;
+  created_at: string;
+  updated_at: string;
+  education_level: string;
+  company_name: string;
+  logo_url: string;
+  categories: string | null;
+}
+
+interface Company {
+  company_id: number;
+  company_name: string;
+  // Thêm các trường khác nếu cần
+}
+
+interface TokenPayload {
+  userId: number;
+  // Thêm các trường khác từ token nếu cần
+}
 
 const statusOptions = [
   { value: "all", label: "Tất cả trạng thái" },
@@ -60,25 +71,97 @@ const statusOptions = [
   { value: "paused", label: "Tạm dừng" },
   { value: "expired", label: "Hết hạn" },
   { value: "completed", label: "Hoàn thành" },
-]
+];
 
 export default function JobPostsPage() {
-  const [searchTerm, setSearchTerm] = useState("")
-  const [statusFilter, setStatusFilter] = useState("all")
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Lấy token từ localStorage
+        const token = localStorage.getItem("token");
+        if (!token) {
+          throw new Error("Không tìm thấy token. Vui lòng đăng nhập!");
+        }
+
+        // Giải mã token để lấy user_id
+        const decodedToken = jwtDecode<TokenPayload>(token);
+        console.log(decodedToken)
+        const userId = decodedToken.userId;
+        console.log(userId)
+        // Gọi API để lấy danh sách công ty theo user_id
+        const companiesResponse = await axios.get(`http://localhost:3000/companiess/user/${userId}`);
+        const companies = companiesResponse.data;
+
+        if (!companies || companies.length === 0) {
+          throw new Error("Không tìm thấy công ty nào liên quan đến người dùng.");
+        }
+
+        // Lấy company_id đầu tiên (hoặc bạn có thể chọn công ty cụ thể)
+        const companyId = companies.company_id;
+        console.log(companyId)
+
+        // Gọi API để lấy danh sách công việc theo company_id
+        const jobsResponse = await axios.get(`http://localhost:3000/jobss/by-company/${companyId}`);
+        setJobs(jobsResponse.data);
+      } catch (err: any) {
+        console.error("Error fetching data:", err);
+        setError(err.message || "Không thể tải dữ liệu. Vui lòng thử lại!");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case "Đang tuyển":
-        return <Badge className="bg-green-500 text-white">Đang tuyển</Badge>
-      case "Tạm dừng":
-        return <Badge className="bg-yellow-500 text-white">Tạm dừng</Badge>
-      case "Hết hạn":
-        return <Badge className="bg-red-500 text-white">Hết hạn</Badge>
-      case "Hoàn thành":
-        return <Badge className="bg-blue-500 text-white">Hoàn thành</Badge>
+      case "active":
+        return <Badge className="bg-green-500 text-white">Đang tuyển</Badge>;
+      case "pending":
+      case "paused":
+        return <Badge className="bg-yellow-500 text-white">Tạm dừng</Badge>;
+      case "expired":
+        return <Badge className="bg-red-500 text-white">Hết hạn</Badge>;
+      case "rejected":
+      case "completed":
+        return <Badge className="bg-blue-500 text-white">Hoàn thành</Badge>;
       default:
-        return <Badge variant="secondary">{status}</Badge>
+        return <Badge variant="secondary">{status}</Badge>;
     }
+  };
+
+  const formatSalary = (min: number, max: number) => {
+    return `${min.toLocaleString("vi-VN")} - ${max.toLocaleString("vi-VN")} triệu VND`;
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("vi-VN");
+  };
+
+  const filteredJobs = jobs.filter((job) => {
+    const matchesSearch = job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      job.location.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === "all" ||
+      (statusFilter === "active" && job.status === "active") ||
+      (statusFilter === "paused" && job.status === "pending") ||
+      (statusFilter === "expired" && new Date(job.deadline) < new Date()) ||
+      (statusFilter === "completed" && (job.status === "rejected" || job.status === "completed"));
+    return matchesSearch && matchesStatus;
+  });
+
+  if (loading) {
+    return <div className="text-center py-10">Đang tải...</div>;
+  }
+
+  if (error) {
+    return <div className="text-center py-10 text-red-600">{error}</div>;
   }
 
   return (
@@ -132,21 +215,21 @@ export default function JobPostsPage() {
 
       {/* Job Posts List */}
       <div className="space-y-4">
-        {jobPosts.map((job) => (
-          <Card key={job.id} className="hover:shadow-md transition-shadow">
+        {filteredJobs.map((job) => (
+          <Card key={job.job_id} className="hover:shadow-md transition-shadow">
             <CardContent className="p-6">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center space-x-3 mb-2">
                     <h3 className="text-lg font-semibold">{job.title}</h3>
-                    {job.isHot && <Badge className="bg-red-500 text-white text-xs">HOT</Badge>}
-                    {job.isUrgent && <Badge className="bg-orange-500 text-white text-xs">GẤP</Badge>}
+                    {job.priority_score > 5 && <Badge className="bg-red-500 text-white text-xs">HOT</Badge>}
+                    {job.priority_score > 8 && <Badge className="bg-orange-500 text-white text-xs">GẤP</Badge>}
                   </div>
 
                   <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-3">
                     <div className="flex items-center space-x-1">
                       <FileText className="w-4 h-4" />
-                      <span>{job.category}</span>
+                      <span>{job.categories || "Chưa có danh mục"}</span>
                     </div>
                     <div className="flex items-center space-x-1">
                       <MapPin className="w-4 h-4" />
@@ -154,18 +237,18 @@ export default function JobPostsPage() {
                     </div>
                     <div className="flex items-center space-x-1">
                       <DollarSign className="w-4 h-4" />
-                      <span>{job.salary}</span>
+                      <span>{formatSalary(job.salary_min, job.salary_max)}</span>
                     </div>
                     <div className="flex items-center space-x-1">
                       <Calendar className="w-4 h-4" />
-                      <span>Hạn: {new Date(job.deadline).toLocaleDateString("vi-VN")}</span>
+                      <span>Hạn: {formatDate(job.deadline)}</span>
                     </div>
                   </div>
 
                   <div className="flex items-center space-x-4">
                     {getStatusBadge(job.status)}
                     <span className="text-sm text-gray-600">
-                      {job.applications} ứng viên • {job.views} lượt xem
+                      {job.application_count} ứng viên • {job.view_count} lượt xem
                     </span>
                   </div>
                 </div>
@@ -187,7 +270,7 @@ export default function JobPostsPage() {
         ))}
       </div>
 
-      {jobPosts.length === 0 && (
+      {filteredJobs.length === 0 && (
         <div className="text-center py-12">
           <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <FileText className="w-12 h-12 text-gray-400" />
@@ -203,5 +286,5 @@ export default function JobPostsPage() {
         </div>
       )}
     </div>
-  )
+  );
 }

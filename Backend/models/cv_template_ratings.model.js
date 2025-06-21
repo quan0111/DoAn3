@@ -18,6 +18,42 @@ cv_template_ratings.getById = (id, callback) => {
     callback(result);
   });
 };
+cv_template_ratings.getByTemplateId = (template_id, callback) => {
+  const sqlString = `
+    SELECT r.*, u.full_name
+    FROM cv_template_ratings r
+    LEFT JOIN users u ON r.user_id = u.user_id
+    WHERE r.template_id = ?
+    ORDER BY r.rating_id DESC
+  `;
+  db.query(sqlString, [template_id], (err, result) => {
+    if (err) return callback(err);
+    callback(null, result);
+  });
+};
+cv_template_ratings.getAverageRating = (template_id, callback) => {
+  const sqlString = `
+    SELECT 
+      AVG(rating) AS average_rating, 
+      COUNT(*) AS total_ratings 
+    FROM cv_template_ratings 
+    WHERE template_id = ?
+  `;
+  db.query(sqlString, [template_id], (err, result) => {
+    if (err) return callback(err);
+    callback(null, result[0]);
+  });
+};
+cv_template_ratings.hasUserRated = (template_id, user_id, callback) => {
+  const sqlString = `
+    SELECT * FROM cv_template_ratings 
+    WHERE template_id = ? AND user_id = ?
+  `;
+  db.query(sqlString, [template_id, user_id], (err, result) => {
+    if (err) return callback(err);
+    callback(null, result.length > 0);
+  });
+};
 
 cv_template_ratings.getAll = (callback) => {
   const sqlString = "SELECT * FROM cv_template_ratings ";

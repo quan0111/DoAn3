@@ -38,7 +38,7 @@ cv_template_industries.insert = (cv_template_industries, callBack) => {
 };
 
 cv_template_industries.update = (cv_template_industries, id, callBack) => {
-  const sqlString = "UPDATE cv_template_industries SET ? WHERE id = ?";
+  const sqlString = "UPDATE cv_template_industries SET ? WHERE template_id = ?";
   db.query(sqlString, [cv_template_industries, id], (err, res) => {
     if (err) {
       callBack(err);
@@ -55,6 +55,33 @@ cv_template_industries.delete = (id, callBack) => {
       return;
     }
     callBack("xóa cv_template_industries có template_id = " + id + " thành công");
+  });
+};
+cv_template_industries.getIndustriesByTemplate = (template_id, callback) => {
+  const sqlString = `
+    SELECT industry FROM cv_template_industries 
+    WHERE template_id = ?
+  `;
+  db.query(sqlString, [template_id], (err, result) => {
+    if (err) return callback(err);
+    callback(null, result.map(row => row.industry));
+  });
+};
+cv_template_industries.getIndustriesByTemplate = (template_id, callback) => {
+  const sqlString = `
+    SELECT industry FROM cv_template_industries 
+    WHERE template_id = ?
+  `;
+  db.query(sqlString, [template_id], (err, result) => {
+    if (err) return callback(err);
+    callback(null, result.map(row => row.industry));
+  });
+};
+cv_template_industries.deleteAll = (template_id, callback) => {
+  const sqlString = "DELETE FROM cv_template_industries WHERE template_id = ?";
+  db.query(sqlString, [template_id], (err, res) => {
+    if (err) return callback(err);
+    callback(null, `Đã xóa toàn bộ ngành của template_id = ${template_id}`);
   });
 };
 

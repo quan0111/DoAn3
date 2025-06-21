@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Search, MapPin, Heart } from "lucide-react"
+import { Link } from "react-router-dom"
 
 // Type definitions
 interface Job {
@@ -151,7 +152,7 @@ export default function JobListings() {
             asChild
             className="bg-[#00C853] text-white hover:bg-[#00A64B] text-sm px-3 py-1 rounded-md"
           >
-            <a href="/jobs">Xem tất cả</a>
+            <Link to="/viec-lam">Xem tất cả</Link>
           </Button>
         </div>
       </div>

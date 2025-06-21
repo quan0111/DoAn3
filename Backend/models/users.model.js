@@ -1,5 +1,5 @@
-
 const db = require("../common/db");
+const bcrypt = require("bcrypt");
 
 const users = (users) => {
   this.user_id = users.user_id;
@@ -17,71 +17,91 @@ const users = (users) => {
   this.last_login = users.last_login;
 };
 
-users.getById = (id, callback) => {
-  const sqlString = "SELECT * FROM users WHERE user_id = ? ";
-  db.query(sqlString, id, (err, result) => {
-    if (err) {
-      return callback(err);
-    }
-    callback(result);
-  });
-};
-
 users.getAll = (callback) => {
-  const sqlString = "SELECT * FROM users ";
-  db.query(sqlString, (err, result) => {
-    if (err) {
-      return callback(err);
-    }
-    callback(result);
+  const sql = "SELECT * FROM users";
+  db.query(sql, (err, result) => {
+    if (err) return callback(err, null);
+    callback( result);
   });
 };
 
-users.insert = (users, callBack) => {
-  const sqlString = "INSERT INTO users SET ?";
-  db.query(sqlString, users, (err, res) => {
-    if (err) {
-      callBack(err);
-      return;
-    }
-    callBack({ id: res.insertId, ...users });
+users.getById = (id, callback) => {
+  const sql = "SELECT * FROM users WHERE user_id = ?";
+  db.query(sql, [id], (err, result) => {
+    if (err) return callback(err, null);
+    callback( result[0]);
   });
 };
 
-users.update = (users, id, callBack) => {
-  const sqlString = "UPDATE users SET ? WHERE user_id = ?";
-  db.query(sqlString, [users, id], (err, res) => {
-    if (err) {
-      callBack(err);
-      return;
-    }
-    callBack("cập nhật users có id = " + id + " thành công");
-  });
-};
-
-users.delete = (id, callBack) => {
-  db.query(`DELETE FROM users WHERE id = ?`, id, (err, res) => {
-    if (err) {
-      callBack(err);
-      return;
-    }
-    callBack("xóa users có id = " + id + " thành công");
-  });
-};
 users.getByEmail = (email, callback) => {
-  const sqlString = "SELECT * FROM users WHERE email = ?";
-  db.query(sqlString, [email], (err, result) => {
-    if (err) return callback(err);
-    callback(null, result[0]); // Trả về 1 user (nếu có)
-  });
-};
-users.updateLastLogin = (id, callback) => {
-  const sqlString = "UPDATE users SET last_login = NOW() WHERE user_id = ?";
-  db.query(sqlString, [id], (err, res) => {
-    if (err) return callback(err);
-    callback(null, "Đã cập nhật last_login cho user có id = " + id);
+  const sql = "SELECT * FROM users WHERE email = ?";
+  db.query(sql, [email], (err, result) => {
+    if (err) return callback(err, null);
+    if (result.length === 0) return callback(null, null); // Không tìm thấy user
+    callback(null, result[0]); // ✅ Trả về user object duy nhất
   });
 };
 
+users.insert = (userData, callback) => {
+  const sql = "INSERT INTO users SET ?";
+  db.query(sql, userData, (err, res) => {
+    if (err) return callback(err, null);
+    callback(null, { id: res.insertId, ...userData });
+  });
+};
+
+users.update = (userData, id, callback) => {
+  const sql = "UPDATE users SET ? WHERE user_id = ?";
+  db.query(sql, [userData, id], (err, res) => {
+    if (err) return callback(err, null);
+    callback(null, `Cập nhật user có id = ${id} thành công`);
+  });
+};
+
+users.delete = (id, callback) => {
+  const sql = "DELETE FROM users WHERE user_id = ?";
+  db.query(sql, [id], (err, res) => {
+    if (err) return callback(err, null);
+    callback(null, `Xóa user có id = ${id} thành công`);
+  });
+};
+
+users.updateLastLogin = (id, callback) => {
+  const sql = "UPDATE users SET last_login = NOW() WHERE user_id = ?";
+  db.query(sql, [id], (err, res) => {
+    if (err) return callback(err, null);
+    callback(null, `Đã cập nhật last_login cho user có id = ${id}`);
+  });
+};
+
+users.updateActiveStatus = (id, isActive, callback) => {
+  const sql = "UPDATE users SET is_active = ? WHERE user_id = ?";
+  db.query(sql, [isActive, id], (err, res) => {
+    if (err) return callback(err, null);
+    callback(null, `Đã cập nhật trạng thái hoạt động cho user có id = ${id}`);
+  });
+};
+
+users.verifyPassword = (userId, password, callback) => {
+  const sql = "SELECT password_hash FROM users WHERE user_id = ?";
+  db.query(sql, [userId], (err, result) => {
+    if (err) return callback(err, null);
+    if (result.length === 0) return callback(null, { success: false });
+    const isMatch = bcrypt.compareSync(password, result[0].password_hash);
+    callback(null, { success: isMatch });
+  });
+};
+
+users.changePassword = (userId, newPassword, callback) => {
+  const saltRounds = 10;
+  bcrypt.hash(newPassword, saltRounds, (err, hash) => {
+    if (err) return callback(err, null);
+    const sql = "UPDATE users SET password_hash = ?, updated_at = NOW() WHERE user_id = ?";
+    db.query(sql, [hash, userId], (err, res) => {
+      if (err) return callback(err, null);
+      callback(null, "Đổi mật khẩu thành công");
+    });
+  });
+};
 
 module.exports = users;

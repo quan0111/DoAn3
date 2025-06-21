@@ -1,194 +1,128 @@
+
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Building, MapPin, Globe, Upload, X, Check, ChevronsUpDown } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import { Link, useNavigate } from "react-router-dom";
-import { useState, useRef } from "react";
-import { Toaster, toast } from "sonner";
-import axios from "axios";
-import { cn } from "@/lib/utils";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Command, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ArrowRight, Mail, LockKeyhole, User, Briefcase, Phone } from "lucide-react";
+import { useState, type FormEvent, type ChangeEvent } from "react";
+import type { CheckedState } from "@radix-ui/react-checkbox";
+import { Calendar28 } from "@/components/calendar28";
 
-// Interface cho dữ liệu người dùng
-interface UserData {
-  user_id?: number;
-  fullname: string;
+interface FormData {
+  full_name: string;
   email: string;
   password: string;
+  confirmPassword: string;
   phone: string;
-  gender: string;
+  gender: "male" | "female";
   dob: string;
-  role: string;
+  role: "jobseeker" | "employer";
+  terms: boolean;
 }
 
-export default function EmployerCompanyInfoPage() {
+export default function RegisterPage() {
   const navigate = useNavigate();
-
-  // State để lưu dữ liệu form công ty
-  const [formData, setFormData] = useState({
-    company_name: "",
-    description: "",
-    logo_url: "",
-    website: "",
-    location: "",
-    company_size: "",
-    industries: [] as string[],
-  });
-
-  // State để lưu dữ liệu form người dùng
-  const [userFormData, setUserFormData] = useState({
-    fullname: "",
+  const [formData, setFormData] = useState<FormData>({
+    full_name: "",
     email: "",
     password: "",
+    confirmPassword: "",
     phone: "",
-    gender: "",
+    gender: "male",
     dob: "",
-    role: "employer",
+    role: "jobseeker",
+    terms: false,
   });
+  const [error, setError] = useState<string>("");
+  const [success, setSuccess] = useState<string>("");
 
-  // State để hiển thị preview ảnh logo
-  const [logoPreview, setLogoPreview] = useState<string | null>(null);
-
-  // State để kiểm soát trạng thái gửi form
-  const [loading, setLoading] = useState(false);
-
-  // State để kiểm soát trạng thái mở/đóng của Popover
-  const [isIndustryOpen, setIsIndustryOpen] = useState(false);
-
-  // Ref để truy cập input file
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  // Danh sách ngành nghề
-  const industryOptions = [
-    "Công nghệ thông tin",
-    "Tài chính - Ngân hàng",
-    "Marketing - Truyền thông",
-    "Giáo dục - Đào tạo",
-    "Khác",
-  ];
-
-  // Hàm xử lý thay đổi input cho form công ty
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { id, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [id]: type === "checkbox" ? checked : value,
+    }));
   };
 
-  // Hàm xử lý thay đổi input cho form người dùng
-  const handleUserChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setUserFormData((prev) => ({ ...prev, [name]: value }));
+  const handleRoleChange = (role: "jobseeker" | "employer") => {
+    setFormData((prev) => ({ ...prev, role }));
   };
 
-  // Hàm xử lý thay đổi select
-  const handleSelectChange = (name: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [name]: value }));
+  const handleGenderChange = (gender: "male" | "female") => {
+    setFormData((prev) => ({ ...prev, gender }));
   };
 
-  // Hàm xử lý thay đổi select cho người dùng
-  const handleUserSelectChange = (name: string, value: string) => {
-    setUserFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  // Hàm xử lý chọn file logo
-  const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setLogoPreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-
-      const fakeUploadedUrl = URL.createObjectURL(file);
-      setFormData((prev) => ({ ...prev, logo_url: fakeUploadedUrl }));
-    }
-  };
-
-  // Hàm xử lý chọn/xóa ngành nghề
-  const handleIndustryChange = (industry: string) => {
-    setFormData((prev) => {
-      const industries = prev.industries.includes(industry)
-        ? prev.industries.filter((item) => item !== industry)
-        : [...prev.industries, industry];
-      return { ...prev, industries };
-    });
-  };
-
-  // Hàm tạo người dùng mới qua API
-  const createUser = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      const userData = {
-        ...userFormData,
-        dob: new Date(userFormData.dob).toISOString(), // Chuyển đổi dob thành chuỗi ISO
-      };
-
-      const response = await axios.post("http://localhost:3000/userss", userData);
-
-      if (response.status === 201) {
-        const userId = response.data.id; // Giả sử API trả về user_id trong response
-        const savedUserData: UserData = {
-          ...userData,
-          user_id: userId,
-        };
-
-        // Lưu vào localStorage
-        localStorage.setItem("userData", JSON.stringify(savedUserData));
-        toast.success("Người dùng đã được tạo thành công!");
-      }
-    } catch (error) {
-      console.error("Lỗi khi tạo người dùng:", error);
-      toast.error("Đã có lỗi xảy ra khi tạo người dùng. Vui lòng thử lại.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Hàm xử lý submit form công ty
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      // Lấy userData từ localStorage
-      const storedUserData = localStorage.getItem("userData");
-      if (!storedUserData) {
-        toast.error("Vui lòng tạo người dùng trước khi thêm công ty!");
-        setLoading(false);
+  const handleDateChange = (date: Date | undefined, formattedValue: string) => {
+    if (date) {
+      const today = new Date();
+      if (today.getFullYear() - date.getFullYear() < 18) {
+        setError("Bạn phải từ 18 tuổi trở lên");
         return;
       }
-
-      const userData: UserData = JSON.parse(storedUserData);
-      const userId = userData.user_id;
-
-      if (!userId) {
-        toast.error("Không tìm thấy user_id. Vui lòng đăng nhập lại!");
-        setLoading(false);
+      if (date > today) {
+        setError("Ngày sinh không được trong tương lai");
         return;
       }
+    }
+    setError("");
+    setFormData((prev) => ({
+      ...prev,
+      dob: formattedValue,
+    }));
+  };
 
-      const response = await axios.post("http://localhost:3000/companiess", {
-        ...formData,
-        industry: formData.industries.join(", "),
-        user_id: userId,
-        verified: false,
-      });
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
 
-      if (response.status === 201) {
-        toast.success("Thông tin công ty đã được lưu thành công!");
-        navigate("/nha-tuyen-dung");
-      }
-    } catch (error) {
-      console.error("Lỗi khi lưu thông tin công ty:", error);
-      toast.error("Đã có lỗi xảy ra khi lưu công ty. Vui lòng thử lại.");
-    } finally {
-      setLoading(false);
+    // Kiểm tra các trường bắt buộc
+    if (!formData.full_name || !formData.email || !formData.password || !formData.phone || !formData.dob) {
+      setError("Vui lòng điền đầy đủ thông tin");
+      return;
+    }
+
+    // Kiểm tra mật khẩu khớp
+    if (formData.password !== formData.confirmPassword) {
+      setError("Mật khẩu và xác nhận mật khẩu không khớp");
+      return;
+    }
+
+    // Kiểm tra độ dài mật khẩu
+    if (formData.password.length < 4) {
+      setError("Mật khẩu phải có ít nhất 8 ký tự");
+      return;
+    }
+
+    // Kiểm tra điều khoản
+    if (!formData.terms) {
+      setError("Vui lòng đồng ý với điều khoản và chính sách riêng tư");
+      return;
+    }
+
+    // Chuẩn bị dữ liệu lưu vào localStorage
+    const { confirmPassword, ...safeUserData } = formData;
+    const userData = {
+      ...safeUserData,
+      avatar_url: null,
+    };
+
+    try {
+      // Lưu vào localStorage
+      localStorage.setItem("userData", JSON.stringify(userData));
+      setSuccess("Đăng ký thành công! Đang chuyển hướng...");
+      setTimeout(() => {
+        if (formData.role === "employer") {
+          navigate("/nha-tuyen-dung/dang-ky");
+        } else {
+          navigate("/Profile");
+        }
+      }, 2000);
+    } catch (err) {
+      setError("Đã có lỗi xảy ra khi lưu thông tin");
     }
   };
 
@@ -203,20 +137,20 @@ export default function EmployerCompanyInfoPage() {
               <div className="absolute inset-0 bg-green-600 bg-opacity-90"></div>
               <img
                 src="/placeholder.svg?height=1000&width=800"
-                alt="Company Info"
+                alt="Register"
                 className="h-full w-full object-cover opacity-50"
               />
               <div className="absolute inset-0 flex flex-col items-center justify-center p-12 text-white">
-                <h2 className="mb-6 text-3xl font-bold">Hoàn thiện thông tin công ty của bạn!</h2>
+                <h2 className="mb-6 text-3xl font-bold">Bắt đầu hành trình nghề nghiệp của bạn!</h2>
                 <p className="mb-8 text-center text-lg">
-                  Cung cấp thông tin chi tiết về công ty để xây dựng thương hiệu tuyển dụng và thu hút ứng viên chất lượng.
+                  Tạo tài khoản miễn phí để tiếp cận hàng nghìn cơ hội việc làm và công cụ xây dựng CV chuyên nghiệp.
                 </p>
                 <div className="mb-8 space-y-4">
                   {[
-                    "Tăng độ tin cậy với ứng viên",
-                    "Tạo ấn tượng với thương hiệu tuyển dụng",
-                    "Thu hút nhân tài phù hợp",
-                    "Quản lý thông tin dễ dàng",
+                    "Tạo CV chuyên nghiệp dễ dàng",
+                    "Ứng tuyển nhanh chóng vào nhiều vị trí",
+                    "Quản lý hồ sơ nghề nghiệp tập trung",
+                    "Nhận thông báo về cơ hội phù hợp",
                   ].map((feature, i) => (
                     <div key={i} className="flex items-start">
                       <div className="mr-2 mt-1 h-1.5 w-1.5 rounded-full bg-white"></div>
@@ -225,329 +159,227 @@ export default function EmployerCompanyInfoPage() {
                   ))}
                 </div>
                 <div>
-                  <p className="mb-4 text-center">Đã có thông tin công ty?</p>
+                  <p className="mb-4 text-center">Bạn đã có tài khoản?</p>
                   <Button variant="secondary" asChild>
-                    <Link to="/nha-tuyen-dung">Quản lý công ty</Link>
+                    <Link to="/Login">Đăng nhập</Link>
                   </Button>
                 </div>
               </div>
             </div>
 
-            {/* Company Info Form */}
+            {/* Register Form */}
             <div className="mx-auto flex max-w-md flex-col justify-center space-y-6 p-4 md:p-8">
               <div className="text-center lg:text-left">
-                <h1 className="text-3xl font-bold">Nhập thông tin người dùng và công ty</h1>
-                <p className="mt-2 text-gray-500">Cung cấp thông tin để bắt đầu quản lý công ty của bạn</p>
+                <h1 className="text-3xl font-bold">Đăng ký tài khoản</h1>
+                <p className="mt-2 text-gray-500">Tạo tài khoản miễn phí để bắt đầu hành trình nghề nghiệp</p>
               </div>
 
-              {/* Form tạo người dùng */}
-              <form onSubmit={createUser} className="grid gap-4">
-                <div className="grid gap-2">
-                  <label htmlFor="fullname" className="text-sm font-medium text-left">
-                    Họ và tên
-                  </label>
-                  <Input
-                    id="fullname"
-                    name="fullname"
-                    placeholder="Nguyễn Văn A"
-                    value={userFormData.fullname}
-                    onChange={handleUserChange}
-                    required
-                  />
-                </div>
+              {error && <p className="text-red-500 text-center">{error}</p>}
+              {success && <p className="text-green-500 text-center">{success}</p>}
 
-                <div className="grid gap-2">
-                  <label htmlFor="email" className="text-sm font-medium text-left">
-                    Email
-                  </label>
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    placeholder="example@domain.com"
-                    value={userFormData.email}
-                    onChange={handleUserChange}
-                    required
-                  />
-                </div>
-
-                <div className="grid gap-2">
-                  <label htmlFor="password" className="text-sm font-medium text-left">
-                    Mật khẩu
-                  </label>
-                  <Input
-                    id="password"
-                    name="password"
-                    type="password"
-                    placeholder="Nhập mật khẩu"
-                    value={userFormData.password}
-                    onChange={handleUserChange}
-                    required
-                  />
-                </div>
-
-                <div className="grid gap-2">
-                  <label htmlFor="phone" className="text-sm font-medium text-left">
-                    Số điện thoại
-                  </label>
-                  <Input
-                    id="phone"
-                    name="phone"
-                    placeholder="0123456789"
-                    value={userFormData.phone}
-                    onChange={handleUserChange}
-                    required
-                  />
-                </div>
-
-                <div className="grid gap-2">
-                  <label htmlFor="gender" className="text-sm font-medium text-left">
-                    Giới tính
-                  </label>
-                  <Select
-                    onValueChange={(value) => handleUserSelectChange("gender", value)}
-                    value={userFormData.gender}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Chọn giới tính" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Nam">Nam</SelectItem>
-                      <SelectItem value="Nữ">Nữ</SelectItem>
-                      <SelectItem value="Khác">Khác</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="grid gap-2">
-                  <label htmlFor="dob" className="text-sm font-medium text-left">
-                    Ngày sinh
-                  </label>
-                  <Input
-                    id="dob"
-                    name="dob"
-                    type="date"
-                    value={userFormData.dob}
-                    onChange={handleUserChange}
-                    required
-                  />
-                </div>
-
-                <Button
-                  type="submit"
-                  className="bg-blue-600 hover:bg-blue-700"
-                  disabled={loading}
-                >
-                  {loading ? "Đang tạo..." : "Tạo người dùng"}
-                </Button>
-              </form>
-
-              {/* Form tạo công ty */}
               <form onSubmit={handleSubmit} className="grid gap-4">
-                {/* Logo Upload */}
                 <div className="grid gap-2">
-                  <label htmlFor="logo_url" className="text-sm font-medium text-left">
-                    Logo công ty
-                  </label>
-                  <div className="flex flex-col items-center gap-2">
-                    <div
-                      className="relative h-24 w-24 rounded-full bg-gray-200 flex items-center justify-center cursor-pointer overflow-hidden"
-                      onClick={() => fileInputRef.current?.click()}
-                    >
-                      {logoPreview ? (
-                        <img
-                          src={logoPreview}
-                          alt="Logo Preview"
-                          className="h-full w-full object-cover rounded-full"
-                        />
-                      ) : (
-                        <Upload className="h-8 w-8 text-gray-400" />
-                      )}
-                    </div>
-                    <Input
-                      type="file"
-                      id="logo_url"
-                      name="logo_url"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleLogoChange}
-                      ref={fileInputRef}
-                    />
-                    <p className="text-sm text-gray-500">Nhấn để chọn logo (tối đa 5MB)</p>
-                  </div>
-                </div>
-
-                <div className="grid gap-2">
-                  <label htmlFor="company_name" className="text-sm font-medium text-left">
-                    Tên công ty
-                  </label>
+                  <Label htmlFor="full_name" className="text-sm font-medium">
+                    Họ và tên
+                  </Label>
                   <div className="relative">
-                    <Building className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                    <User className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
                     <Input
-                      id="company_name"
-                      name="company_name"
-                      placeholder="Công ty ABC"
+                      id="full_name"
+                      placeholder="Nguyễn Văn A"
                       className="pl-10"
-                      value={formData.company_name}
-                      onChange={handleChange}
-                      required
+                      value={formData.full_name}
+                      onChange={handleInputChange}
                     />
                   </div>
                 </div>
 
                 <div className="grid gap-2">
-                  <label htmlFor="description" className="text-sm font-medium text-left">
-                    Mô tả công ty
-                  </label>
-                  <Textarea
-                    id="description"
-                    name="description"
-                    placeholder="Công ty chúng tôi chuyên về..."
-                    value={formData.description}
-                    onChange={handleChange}
+                  <Label htmlFor="email" className="text-sm font-medium">
+                    Email
+                  </Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                    <Input
+                      id="email"
+                      placeholder="name@example.com"
+                      type="email"
+                      className="pl-10"
+                      autoComplete="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="password" className="text-sm font-medium">
+                    Mật khẩu
+                  </Label>
+                  <div className="relative">
+                    <LockKeyhole className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                    <Input
+                      id="password"
+                      type="password"
+                      className="pl-10"
+                      autoComplete="new-password"
+                      value={formData.password}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="confirmPassword" className="text-sm font-medium">
+                    Xác nhận mật khẩu
+                  </Label>
+                  <div className="relative">
+                    <LockKeyhole className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                    <Input
+                      id="confirmPassword"
+                      type="password"
+                      className="pl-10"
+                      autoComplete="new-password"
+                      value={formData.confirmPassword}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="phone" className="text-sm font-medium">
+                    Số điện thoại
+                  </Label>
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                    <Input
+                      id="phone"
+                      placeholder="0901122334"
+                      type="tel"
+                      className="pl-10"
+                      value={formData.phone}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
+
+                <div className="grid gap-2">
+                  <Label className="text-sm font-medium">Giới tính</Label>
+                  <div className="grid grid-cols-2 gap-4">
+                    <Button
+                      variant={formData.gender === "male" ? "default" : "outline"}
+                      className="justify-start"
+                      onClick={() => handleGenderChange("male")}
+                    >
+                      <User className="mr-2 h-5 w-5" />
+                      Nam
+                    </Button>
+                    <Button
+                      variant={formData.gender === "female" ? "default" : "outline"}
+                      className="justify-start"
+                      onClick={() => handleGenderChange("female")}
+                    >
+                      <User className="mr-2 h-5 w-5" />
+                      Nữ
+                    </Button>
+                  </div>
+                </div>
+
+                <Calendar28
+                  label="Ngày sinh"
+                  value={formData.dob}
+                  onChange={handleDateChange}
+                  error={error}
+                />
+
+                <div className="grid gap-2">
+                  <Label className="text-sm font-medium">Bạn là</Label>
+                  <div className="grid grid-cols-2 gap-4">
+                    <Button
+                      variant={formData.role === "jobseeker" ? "default" : "outline"}
+                      className="justify-start"
+                      onClick={() => handleRoleChange("jobseeker")}
+                    >
+                      <User className="mr-2 h-5 w-5" />
+                      Người tìm việc
+                    </Button>
+                    <Button
+                      variant={formData.role === "employer" ? "default" : "outline"}
+                      className="justify-start"
+                      onClick={() => handleRoleChange("employer")}
+                    >
+                      <Briefcase className="mr-2 h-5 w-5" />
+                      Nhà tuyển dụng
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="terms"
+                    checked={formData.terms}
+                    onCheckedChange={(checked: CheckedState) => setFormData((prev) => ({ ...prev, terms: !!checked }))}
                   />
+                  <Label htmlFor="terms" className="text-sm text-gray-500">
+                    Tôi đồng ý với{" "}
+                    <Link to="#" className="text-green-600 hover:underline">
+                      điều khoản
+                    </Link>{" "}
+                    và{" "}
+                    <Link to="#" className="text-green-600 hover:underline">
+                      chính sách riêng tư
+                    </Link>
+                  </Label>
                 </div>
 
-                <div className="grid gap-2">
-                  <label htmlFor="website" className="text-sm font-medium text-left">
-                    Website
-                  </label>
-                  <div className="relative">
-                    <Globe className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-                    <Input
-                      id="website"
-                      name="website"
-                      placeholder="https://example.com"
-                      className="pl-10"
-                      value={formData.website}
-                      onChange={handleChange}
-                    />
-                  </div>
-                </div>
-
-                <div className="grid gap-2">
-                  <label htmlFor="location" className="text-sm font-medium text-left">
-                    Địa điểm
-                  </label>
-                  <div className="relative">
-                    <MapPin className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-                    <Select
-                      onValueChange={(value) => handleSelectChange("location", value)}
-                      value={formData.location}
-                    >
-                      <SelectTrigger className="pl-10 w-full">
-                        <SelectValue placeholder="Chọn thành phố" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Hà Nội">Hà Nội</SelectItem>
-                        <SelectItem value="TP. Hồ Chí Minh">TP. Hồ Chí Minh</SelectItem>
-                        <SelectItem value="Đà Nẵng">Đà Nẵng</SelectItem>
-                        <SelectItem value="Khác">Khác</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                {/* Multi-select Industry với shadcn/ui Command */}
-                <div className="grid gap-2">
-                  <label className="text-sm font-medium text-left">Ngành nghề</label>
-                  <Popover open={isIndustryOpen} onOpenChange={setIsIndustryOpen}>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        role="combobox"
-                        aria-expanded={isIndustryOpen}
-                        className="w-full justify-between"
-                      >
-                        {formData.industries.length > 0
-                          ? formData.industries.join(", ")
-                          : "Chọn ngành nghề"}
-                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-[200px] p-0">
-                      <Command>
-                        <CommandList>
-                          <CommandGroup>
-                            {industryOptions.map((industry) => (
-                              <CommandItem
-                                key={industry}
-                                value={industry}
-                                onSelect={() => {
-                                  handleIndustryChange(industry);
-                                }}
-                              >
-                                <Check
-                                  className={cn(
-                                    "mr-2 h-4 w-4",
-                                    formData.industries.includes(industry)
-                                      ? "opacity-100"
-                                      : "opacity-0"
-                                  )}
-                                />
-                                {industry}
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
-                  {formData.industries.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {formData.industries.map((industry) => (
-                        <div
-                          key={industry}
-                          className="flex items-center gap-1 bg-green-100 text-green-800 text-sm px-2 py-1 rounded-full"
-                        >
-                          <span>{industry}</span>
-                          <button
-                            type="button"
-                            onClick={() => handleIndustryChange(industry)}
-                            className="text-green-600 hover:text-green-800"
-                          >
-                            <X className="h-4 w-4" />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                <div className="grid gap-2">
-                  <label htmlFor="company_size" className="text-sm font-medium text-left">
-                    Quy mô công ty
-                  </label>
-                  <Select
-                    onValueChange={(value) => handleSelectChange("company_size", value)}
-                    value={formData.company_size}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Chọn quy mô" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1-10">1-10 nhân viên</SelectItem>
-                      <SelectItem value="11-50">11-50 nhân viên</SelectItem>
-                      <SelectItem value="51-200">51-200 nhân viên</SelectItem>
-                      <SelectItem value="201-500">201-500 nhân viên</SelectItem>
-                      <SelectItem value="500+">Trên 500 nhân viên</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <Button
-                  type="submit"
-                  className="bg-green-600 hover:bg-green-700"
-                  disabled={loading}
-                >
-                  {loading ? "Đang lưu..." : "Lưu thông tin công ty"}
+                <Button type="submit" className="bg-green-600 hover:bg-green-700">
+                  Đăng ký <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </form>
+
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t"></span>
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background px-2 text-gray-500">Hoặc đăng ký với</span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <Button variant="outline">
+                  <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
+                    <path
+                      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                      fill="#4285F4"
+                    />
+                    <path
+                      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                      fill="#34A853"
+                    />
+                    <path
+                      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                      fill="#FBBC05"
+                    />
+                    <path
+                      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                      fill="#EA4335"
+                    />
+                  </svg>
+                  Google
+                </Button>
+                <Button variant="outline">
+                  <svg className="mr-2 h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z" />
+                  </svg>
+                  Facebook
+                </Button>
+              </div>
 
               <div className="mt-4 text-center text-sm lg:hidden">
-                Đã có thông tin công ty?{" "}
-                <Link to="/nha-tuyen-dung" className="font-medium text-green-600 hover:underline">
-                  Quản lý công ty
+                Bạn đã có tài khoản?{" "}
+                <Link to="/Login" className="font-medium text-green-600 hover:underline">
+                  Đăng nhập
                 </Link>
               </div>
             </div>
@@ -555,7 +387,6 @@ export default function EmployerCompanyInfoPage() {
         </div>
       </main>
       <Footer />
-      <Toaster />
     </div>
   );
 }

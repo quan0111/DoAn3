@@ -15,55 +15,52 @@ const jobseekers = (jobseekers) => {
   this.updated_at = jobseekers.updated_at;
 };
 
-jobseekers.getById = (id, callback) => {
-  const sqlString = "SELECT * FROM jobseekers WHERE user_id = ? ";
-  db.query(sqlString, id, (err, result) => {
-    if (err) {
-      return callback(err);
-    }
-    callback(result);
-  });
-};
-
 jobseekers.getAll = (callback) => {
-  const sqlString = "SELECT * FROM jobseekers ";
+  const sqlString = `
+        SELECT js.*, u.*
+      FROM jobseekers js
+      JOIN users u ON js.user_id = u.user_id
+  `;
   db.query(sqlString, (err, result) => {
-    if (err) {
-      return callback(err);
-    }
+    if (err) return callback(err);
     callback(result);
   });
 };
 
-jobseekers.insert = (jobseekers, callBack) => {
+jobseekers.getById = (id, callback) => {
+  const sqlString = `
+    SELECT js.*, u.*
+    FROM jobseekers js
+    JOIN users u ON js.user_id = u.user_id
+    WHERE js.user_id = ?
+  `;
+  db.query(sqlString, [id], (err, result) => {
+    if (err) return callback(err);
+    callback(result);
+  });
+};
+
+jobseekers.insert = (jobseeker, callback) => {
   const sqlString = "INSERT INTO jobseekers SET ?";
-  db.query(sqlString, jobseekers, (err, res) => {
-    if (err) {
-      callBack(err);
-      return;
-    }
-    callBack({ id: res.insertId, ...jobseekers });
+  db.query(sqlString, jobseeker, (err, res) => {
+    if (err) return callback(err);
+    callback({ user_id: res.insertId, ...jobseeker });
   });
 };
 
-jobseekers.update = (jobseekers, id, callBack) => {
+jobseekers.update = (jobseeker, id, callback) => {
   const sqlString = "UPDATE jobseekers SET ? WHERE user_id = ?";
-  db.query(sqlString, [jobseekers, id], (err, res) => {
-    if (err) {
-      callBack(err);
-      return;
-    }
-    callBack("cập nhật jobseekers có id = " + id + " thành công");
+  db.query(sqlString, [jobseeker, id], (err, res) => {
+    if (err) return callback(err);
+    callback("Cập nhật jobseeker có id = " + id + " thành công");
   });
 };
 
-jobseekers.delete = (id, callBack) => {
-  db.query(`DELETE FROM jobseekers WHERE user_id = ?`, id, (err, res) => {
-    if (err) {
-      callBack(err);
-      return;
-    }
-    callBack("xóa jobseekers có user_id = " + id + " thành công");
+jobseekers.delete = (id, callback) => {
+  const sqlString = "DELETE FROM jobseekers WHERE user_id = ?";
+  db.query(sqlString, [id], (err, res) => {
+    if (err) return callback(err);
+    callback("Xóa jobseeker có user_id = " + id + " thành công");
   });
 };
 

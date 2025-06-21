@@ -16,7 +16,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 export default function EmployerCompanyInfoPage() {
   const navigate = useNavigate();
 
-  // State để lưu dữ liệu form
   const [formData, setFormData] = useState({
     company_name: "",
     description: "",
@@ -27,19 +26,11 @@ export default function EmployerCompanyInfoPage() {
     industries: [] as string[],
   });
 
-  // State để hiển thị preview ảnh logo
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
-
-  // State để kiểm soát trạng thái gửi form
   const [loading, setLoading] = useState(false);
-
-  // State để kiểm soát trạng thái mở/đóng của Popover
   const [isIndustryOpen, setIsIndustryOpen] = useState(false);
-
-  // Ref để truy cập input file
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Danh sách ngành nghề
   const industryOptions = [
     "Công nghệ thông tin",
     "Tài chính - Ngân hàng",
@@ -48,21 +39,22 @@ export default function EmployerCompanyInfoPage() {
     "Khác",
   ];
 
-  // Hàm xử lý thay đổi input
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Hàm xử lý thay đổi select
   const handleSelectChange = (name: string, value: string) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Hàm xử lý chọn file logo
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("Logo không được vượt quá 5MB");
+        return;
+      }
       const reader = new FileReader();
       reader.onloadend = () => {
         setLogoPreview(reader.result as string);
@@ -74,7 +66,6 @@ export default function EmployerCompanyInfoPage() {
     }
   };
 
-  // Hàm xử lý chọn/xóa ngành nghề
   const handleIndustryChange = (industry: string) => {
     setFormData((prev) => {
       const industries = prev.industries.includes(industry)
@@ -84,26 +75,76 @@ export default function EmployerCompanyInfoPage() {
     });
   };
 
-  // Hàm xử lý submit form
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const response = await axios.post("http://localhost:3000/companies", {
-        ...formData,
-        industry: formData.industries.join(", "),
-        user_id: 1,
-        verified: false,
-      });
-
-      if (response.status === 201) {
-        toast.success("Thông tin công ty đã được lưu thành công!");
-        navigate("/nha-tuyen-dung");
+      // Lấy dữ liệu user từ localStorage
+      const userData = JSON.parse(localStorage.getItem("userData") || "{}");
+      if (!userData.email || !userData.password || !userData.full_name) {
+        toast.error("Thiếu thông tin người dùng (email, mật khẩu, hoặc họ tên). Vui lòng đăng ký lại.");
+        setLoading(false);
+        navigate("/dang-ky");
+        return;
       }
-    } catch (error) {
-      console.error("Lỗi khi lưu thông tin công ty:", error);
-      toast.error("Đã có lỗi xảy ra. Vui lòng thử lại.");
+
+      // Kiểm tra dữ liệu công ty bắt buộc
+      if (!formData.company_name || !formData.location || !formData.company_size || formData.industries.length === 0) {
+        toast.error("Vui lòng điền đầy đủ thông tin bắt buộc của công ty");
+        setLoading(false);
+        return;
+      }
+
+      // Gọi API tạo user
+      const userPayload = {
+        full_name: userData.full_name,
+        email: userData.email,
+        password: userData.password,
+        phone: userData.phone || "",
+        gender: userData.gender || "male",
+        dob: userData.dob || "",
+        role: userData.role || "employer",
+        avatar_url: userData.avatar_url || null,
+      };
+      console.log("User Payload:", userPayload);
+
+      const userResponse = await axios.post("http://localhost:3000/userss", userPayload);
+      if (userResponse.status !== 201 || !userResponse.data.user_id) {
+        throw new Error("Tạo user thất bại hoặc không nhận được user_id");
+      }
+
+      const userId = userResponse.data.user_id;
+      console.log("User created successfully, user_id:", userId);
+
+      // Gọi API tạo công ty
+      const companyPayload = {
+        company_name: formData.company_name,
+        description: formData.description,
+        logo_url: formData.logo_url || "", // Fallback nếu logo_url rỗng
+        website: formData.website,
+        location: formData.location,
+        company_size: formData.company_size,
+        industry: formData.industries.join(", "),
+        user_id: userId,
+        verified: false,
+      };
+      console.log("Company Payload:", companyPayload);
+
+      const companyResponse = await axios.post("http://localhost:3000/companiess", companyPayload);
+      if (companyResponse.status !== 201) {
+        throw new Error("Tạo công ty thất bại");
+      }
+
+      toast.success("Tạo user và công ty thành công!");
+      localStorage.removeItem("userData");
+      setTimeout(() => {
+        navigate("/nha-tuyen-dung");
+      }, 2000);
+    } catch (error: any) {
+      console.error("Lỗi khi lưu thông tin:", error);
+      const errorMessage = error.response?.data?.message || "Đã có lỗi xảy ra. Vui lòng thử lại.";
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -115,7 +156,6 @@ export default function EmployerCompanyInfoPage() {
       <main className="flex-1">
         <div className="container mx-auto my-12 max-w-screen-xl px-4 md:px-8">
           <div className="mx-auto grid max-w-screen-xl gap-8 lg:grid-cols-2">
-            {/* Image Section */}
             <div className="relative hidden overflow-hidden rounded-lg bg-green-600 lg:block">
               <div className="absolute inset-0 bg-green-600 bg-opacity-90"></div>
               <img
@@ -150,7 +190,6 @@ export default function EmployerCompanyInfoPage() {
               </div>
             </div>
 
-            {/* Company Info Form */}
             <div className="mx-auto flex max-w-md flex-col justify-center space-y-6 p-4 md:p-8">
               <div className="text-center lg:text-left">
                 <h1 className="text-3xl font-bold">Nhập thông tin công ty</h1>
@@ -158,7 +197,6 @@ export default function EmployerCompanyInfoPage() {
               </div>
 
               <form onSubmit={handleSubmit} className="grid gap-4">
-                {/* Logo Upload */}
                 <div className="grid gap-2">
                   <label htmlFor="logo_url" className="text-sm font-medium text-left">
                     Logo công ty
@@ -262,7 +300,6 @@ export default function EmployerCompanyInfoPage() {
                   </div>
                 </div>
 
-                {/* Multi-select Industry với shadcn/ui Command */}
                 <div className="grid gap-2">
                   <label className="text-sm font-medium text-left">Ngành nghề</label>
                   <Popover open={isIndustryOpen} onOpenChange={setIsIndustryOpen}>
@@ -372,4 +409,4 @@ export default function EmployerCompanyInfoPage() {
       <Toaster />
     </div>
   );
-}
+} 

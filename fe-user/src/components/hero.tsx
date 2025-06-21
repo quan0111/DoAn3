@@ -29,7 +29,7 @@ export function Hero() {
               <div className="absolute -bottom-4 -right-4 h-full w-full rounded-lg border bg-background"></div>
               <div className="relative h-full w-full overflow-hidden rounded-lg border">
                 <img
-                  src="/placeholder.svg?height=600&width=400"
+                  src="public/banner-02.webp"
                   alt="Xem trước CV"
                   className="w-full object-cover"
                   width={400}

@@ -1,6 +1,6 @@
 "use client"
 
-import { LayoutDashboard, Users, Briefcase, FileText, BarChart3, Settings, Building2, Building, Bell, TrendingUp, Send, Package, } from "lucide-react"
+import { Calendar1,LogOut  ,LayoutDashboard, Users, Briefcase, FileText, BarChart3, Settings, Building2, Building, Bell, TrendingUp, Send, Package,MessageSquareMore,ArrowRightLeft   } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 interface SidebarProps {
@@ -16,12 +16,18 @@ export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
     { id: "report", label: "báo cáo", icon: TrendingUp},
     { id: "nofication", label: "Hệ thống thông báo", icon: Bell},
     { id: "sendnoti", label: "Gửi thông báo", icon: Send},
+    { id: "feedback", label: "Phản hồi người dùng", icon: MessageSquareMore },
+    { id: "transaction", label: "lịch sử giao dịch", icon: ArrowRightLeft },
+    { id: "recentjob", label: "công việc gần đây", icon: Send},
     { id: "notihistory", label: "Lịch sử thông báo", icon: Bell},
     { id:"service", label: "Quản lý dịch vụ",icon: Package },
     { id: "jobs", label: "Quản lý việc làm", icon: Briefcase },
     { id: "cvs", label: "Quản lý CV", icon: FileText },
     { id: "analytics", label: "Thống kê", icon: BarChart3 },
+    { id: "event", label: "sự kiện", icon: Calendar1 },
     { id: "settings", label: "Cài đặt", icon: Settings },
+    { id: "logout", label: "Đăng xuất", icon: LogOut  },
+
   ]
 
   return (

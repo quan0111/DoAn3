@@ -4,7 +4,9 @@ import Home from './page/Home/page'
 import JobDetailPage from './page/Job/ID/page'
 import JobListPage from './page/Job/page'
 import RegisterPage from './page/dang-ky/page'
+import JobseekerInfoPage from './page/profile/page'
 import LoginPage from './page/dang-nhap/Page'
+import EmployerCompanyInfoPage from './page/NhaTuyenDung/dang-ky/page'
 import "./App.css"
 import CVTemplatesPage from './page/CV/Page'
 import CVTemplateDetailPage from './page/CV/ID/page'
@@ -26,10 +28,12 @@ import CareerInsightsPage from './page/Carrer-insight/page'
 import PremiumServicesPage from './page/premium/page'
 import AboutContactPage from './page/about/page'
 import ViewCVPage from './page/view-cv/page'
+import { Toaster } from 'sonner'
 
 function App() {
   return (
     <Router>
+        <Toaster position="top-right" richColors duration={3000} />
       <Routes>
         {/* Định tuyến cho trang mặc định */}
         <Route path="/" element={<Home />} />
@@ -43,7 +47,7 @@ function App() {
         <Route path="/Phan-tich-nghe-nghiep" element={<CareerInsightsPage />} />
         <Route path="/Premium" element={<PremiumServicesPage />} />
         <Route path="/About" element={<AboutContactPage />} />
-        <Route path="/tao-cv" element={<CreateCVPage />} />
+        <Route path="/tao-cv/:id" element={<CreateCVPage />} />
         <Route path="/quan-ly-cv" element={<CVManagementPage />} />
         <Route path="/phan-tich-cv" element={<CVAnalysisPage />} />
         <Route path="/Ho-so-nguoi-dung" element={<ProfilePage />} />
@@ -53,6 +57,8 @@ function App() {
         <Route path="/viec-lam" element={<JobListPage />} />
         <Route path="/viec-lam/:id" element={<JobDetailPage />} />
         <Route path="/dang-ky" element={<RegisterPage />} />
+        <Route path="/nha-tuyen-dung/dang-ky" element={<EmployerCompanyInfoPage />} />
+        <Route path="/Profile" element={<JobseekerInfoPage />} />
         <Route path="/mau-cv" element={<CVTemplatesPage />} />
         <Route path="/mau-cv/:id" element={<CVTemplateDetailPage />} />
         <Route path="/view-cv/:id" element={<ViewCVPage />} />

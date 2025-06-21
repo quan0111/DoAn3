@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Users, Briefcase, FileText, TrendingUp, Eye } from "lucide-react"
-
+import { RecentJobsTable } from "./recent-job"
 export function DashboardOverview() {
   const stats = [
     {
@@ -120,6 +120,13 @@ export function DashboardOverview() {
           </CardContent>
         </Card>
       </div>
+      <Card>
+          <CardHeader>
+          </CardHeader>
+          <CardContent>
+            <RecentJobsTable></RecentJobsTable>
+          </CardContent>
+        </Card>
     </div>
   )
 }
